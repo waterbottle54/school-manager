@@ -15,6 +15,9 @@ class AdminViewModel(QObject):
     class NavigateToStudentFragment(Event):
         pass
 
+    class NavigateToProblemFragment(Event):
+        pass
+
     event: pyqtSignal = pyqtSignal(Event)
 
     def __init__(self):
@@ -28,3 +31,6 @@ class AdminViewModel(QObject):
             
     def on_student_click(self):
         self.event.emit(AdminViewModel.NavigateToStudentFragment())
+
+    def on_problem_click(self):
+        self.event.emit(AdminViewModel.NavigateToProblemFragment())

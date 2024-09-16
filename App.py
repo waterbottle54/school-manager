@@ -7,6 +7,8 @@ from ui.AdminFragment import *
 from ui.DataFragment import *
 from ui.StudentFragment import *
 from ui.StudentViewModel import *
+from ui.ProblemFragment import *
+from ui.ProblemViewModel import *
 
 class MainWindow(QMainWindow):
 
@@ -29,6 +31,9 @@ class MainWindow(QMainWindow):
 
     student_fragment: StudentFragment
     student_view_model: StudentViewModel
+
+    problem_fragment: ProblemFragment
+    problem_view_model: ProblemViewModel
 
     def __init__(self):
         super().__init__()
@@ -56,6 +61,9 @@ class MainWindow(QMainWindow):
 
         self.student_view_model = StudentViewModel()
         self.student_fragment = StudentFragment("학생", self.student_view_model)
+
+        self.problem_view_model = StudentViewModel()
+        self.problem_fragment = StudentFragment("문제", self.problem_view_model)
 
         self.back_stack = list()
         self.navigate(self.home_fragment)
@@ -134,6 +142,8 @@ class MainWindow(QMainWindow):
             self.navigate(self.data_fragment)
         elif isinstance(event, AdminViewModel.NavigateToStudentFragment):
             self.navigate(self.student_fragment)
+        elif isinstance(event, AdminViewModel.NavigateToProblemFragment):
+            self.navigate(self.problem_fragment)
 
     def on_data_event(self, event):
         if isinstance(event, DataViewModel.NavigateBack):

@@ -33,6 +33,7 @@ class AdminFragment(Fragment):
 
         button_problem.setIcon(QIcon('images/document.png'))
         button_problem.setIconSize(QSize(256, 256))
+        button_problem.clicked.connect(self.view_model.on_problem_click)
 
         button_data.setIcon(QIcon('images/db.png'))
         button_data.setIconSize(QSize(256, 256))
