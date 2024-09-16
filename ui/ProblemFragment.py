@@ -30,6 +30,10 @@ class ProblemFragment(Fragment):
         self.setup_problem_list_sector()
         self.setup_problem_input_sector()
 
+        self.view_model.current_grade_idx.observe(self.combo_grade.setCurrentIndex)
+        self.view_model.chapter_list.observe(self.update_chapter_combo)
+        self.view_model.current_chapter_index.observe(self.update_chapter_combo_selection)
+
         self.view_model.event.connect(self.on_event)
 
     def on_resume(self):
@@ -39,12 +43,24 @@ class ProblemFragment(Fragment):
         if (isinstance(event, ProblemViewModel.ConfirmDeleteStudent)):
             pass
 
+    def update_chapter_combo(self, chapters):
+        print(chapters)
+        self.combo_chapter.clear()
+        self.combo_chapter.addItems(chapters)
+
+    def update_chapter_combo_selection(self, i):
+        self.combo_chapter.setCurrentIndex(i)
+
     def setup_problem_list_sector(self):
         self.layout_combo = QHBoxLayout()
         self.layout_left.addLayout(self.layout_combo)
 
         self.combo_grade = QComboBox()
         self.layout_combo.addWidget(self.combo_grade)
+
+        items_grade = [ of_grade(i) for i in self.view_model.grade_list ]
+        self.combo_grade.addItems(items_grade)
+        self.combo_grade.currentIndexChanged.connect(lambda index: self.view_model.on_grade_change(index))
         
         self.combo_chapter = QComboBox()
         self.layout_combo.addWidget(self.combo_chapter)

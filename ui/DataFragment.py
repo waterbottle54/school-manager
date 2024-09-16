@@ -170,9 +170,9 @@ class DataFragment(Fragment):
         self.layout_chapter.addWidget(title)
 
         self.cb_grade = QComboBox()
-        titles_grade = [ of_grade(g) for g in np.arange(6, 12) ]
+        titles_grade = [ of_grade(g) for g in np.arange(0, 12) ]
         self.cb_grade.addItems(titles_grade)
-        self.cb_grade.currentIndexChanged.connect(lambda index: self.view_model.on_grade_change(index))
+        self.cb_grade.currentIndexChanged.connect(lambda index: self.view_model.on_grade_change(index + 0))
         self.layout_chapter.addWidget(self.cb_grade)
 
         self.lw_chapter = QListWidget()

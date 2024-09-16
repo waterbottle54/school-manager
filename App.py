@@ -62,8 +62,8 @@ class MainWindow(QMainWindow):
         self.student_view_model = StudentViewModel()
         self.student_fragment = StudentFragment("학생", self.student_view_model)
 
-        self.problem_view_model = StudentViewModel()
-        self.problem_fragment = StudentFragment("문제", self.problem_view_model)
+        self.problem_view_model = ProblemViewModel()
+        self.problem_fragment = ProblemFragment("문제", self.problem_view_model)
 
         self.back_stack = list()
         self.navigate(self.home_fragment)
