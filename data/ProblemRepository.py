@@ -11,6 +11,7 @@ class ProblemRepository(DatabaseRepository):
         db.cursor.execute(f'''
             CREATE TABLE {self.table_name} (
             p_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
             grade INTEGER NOT NULL,
             chapter TEXT NOT NULL,
             book TEXT NOT NULL,
@@ -22,14 +23,15 @@ class ProblemRepository(DatabaseRepository):
 
     def to_object(self, row):
         id = row[0]
-        grade = row[1]
-        chapter = row[2]
-        book = row[3]
-        num_choice = row[4]
-        ans_mcq = row[5]
-        ans_saq = row[6]
-        created = row[7]
-        return Problem.from_record(id, grade, chapter, book, num_choice, ans_mcq, ans_saq, created)
+        title = row[1]
+        grade = row[2]
+        chapter = row[3]
+        book = row[4]
+        num_choice = row[5]
+        ans_mcq = row[6]
+        ans_saq = row[7]
+        created = row[8]
+        return Problem.from_record(id, title, grade, chapter, book, num_choice, ans_mcq, ans_saq, created)
     
     def query(self) -> list:
         return super().query(f'SELECT * FROM {self.table_name} ORDER BY created DESC')

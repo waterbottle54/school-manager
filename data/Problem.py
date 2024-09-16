@@ -3,7 +3,8 @@ import json
 
 class Problem:
 
-    id: int
+    id: 
+    title: str
     grade: int
     chapter: str
     book: str
@@ -12,9 +13,10 @@ class Problem:
     ans_saq: dict       # answers for a short-answer question (key is description for subquestions)
     created: int
 
-    def __init__(self, grade: int, chapter: str, book: str, num_choice: int, 
+    def __init__(self, title: str, grade: int, chapter: str, book: str, num_choice: int, 
                  ans_msq: list, ans_saq: dict, id=-1, created=int(time())):
         self.id = id
+        self.title = title
         self.grade = grade
         self.chapter = chapter
         self.book = book
@@ -31,6 +33,7 @@ class Problem:
 
         return {
             'p_id': self.id,
+            'title': self.title,
             'grade': self.grade,
             'chapter': self.chapter,
             'book': self.book,
@@ -40,10 +43,11 @@ class Problem:
             'created': self.created
         }
     
-    def from_record(id: int, grade: int, chapter: str, book: str, 
+    def from_record(id: int, title: str, grade: int, chapter: str, book: str, 
                     num_choice: int, json_ans_mcq: str, json_ans_saq: str, created: int):
         problem = Problem(0,'','',0,[],{})
         problem.id = id
+        problem.title = title
         problem.grade = grade
         problem.chapter = chapter
         problem.book = book

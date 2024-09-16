@@ -46,5 +46,11 @@ class ProblemFragment(Fragment):
         self.combo_grade = QComboBox()
         self.layout_combo.addWidget(self.combo_grade)
 
+        self.combo_chapter = QComboBox()
+        self.layout_combo.addWidget(self.combo_chapter)
+
+        self.combo_book = QComboBox()
+        self.layout_combo.addChildLayout(self.combo_book)
+
     def setup_problem_input_sector(self):
         pass
