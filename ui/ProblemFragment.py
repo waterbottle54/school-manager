@@ -40,7 +40,8 @@ class ProblemFragment(Fragment):
             pass
 
     def setup_problem_list_sector(self):
-        layout = QVBoxLayout()
+        self.combo_layout = QHBoxLayout()
+        self.left_layout.addLayout(self.combo_layout)
 
     def setup_problem_input_sector(self):
         pass
