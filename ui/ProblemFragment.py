@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout)
+from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QComboBox)
 from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
 from ui.common.UiUtils import *
@@ -19,8 +19,8 @@ class ProblemFragment(Fragment):
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
-        self.left_layout = QVBoxLayout()
-        self.layout.addLayout(self.left_layout)
+        self.layout_left = QVBoxLayout()
+        self.layout.addLayout(self.layout_left)
 
         self.layout.addSpacing(16)
 
@@ -40,8 +40,11 @@ class ProblemFragment(Fragment):
             pass
 
     def setup_problem_list_sector(self):
-        self.combo_layout = QHBoxLayout()
-        self.left_layout.addLayout(self.combo_layout)
+        self.layout_combo = QHBoxLayout()
+        self.layout_left.addLayout(self.layout_combo)
+
+        self.combo_grade = QComboBox()
+        self.layout_combo.addWidget(self.combo_grade)
 
     def setup_problem_input_sector(self):
         pass
