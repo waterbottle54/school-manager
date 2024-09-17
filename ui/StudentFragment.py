@@ -63,8 +63,7 @@ class StudentFragment(Fragment):
         else:
             self.label_student.setText("")
 
-        self.button_add_wrong.setVisible(student is not None)
-        self.button_remove_wrong.setVisible(student is not None)
+        self.button_miss_manage.setVisible(student is not None)
 
     def table_item_center(self, text: str):
         item = QTableWidgetItem(text)
@@ -118,19 +117,14 @@ class StudentFragment(Fragment):
 
         self.right_header_layout.addStretch(1)
 
-        self.button_add_wrong = QPushButton('오답 추가')
-        self.button_add_wrong.setFixedWidth(150)
-        self.button_add_wrong.setObjectName('modify')
+        self.button_miss_manage = QPushButton('오답 관리')
+        self.button_miss_manage.setFixedWidth(150)
+        self.button_miss_manage.setObjectName('modify')
 
-        self.button_remove_wrong = QPushButton('오답 제거')
-        self.button_remove_wrong.setFixedWidth(150)
-        self.button_remove_wrong.setObjectName('modify')
+        self.right_header_layout.addWidget(self.button_miss_manage)
 
-        self.right_header_layout.addWidget(self.button_add_wrong)
-        self.right_header_layout.addWidget(self.button_remove_wrong)
-
-        self.lw_wrong = QListWidget()
-        self.right_layout.addWidget(self.lw_wrong)
+        self.lw_detail = QListWidget()
+        self.right_layout.addWidget(self.lw_detail)
 
     def prompt_student(self):
         dialog = AddStudentDialog()

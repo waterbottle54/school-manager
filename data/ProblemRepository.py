@@ -31,8 +31,11 @@ class ProblemRepository(DatabaseRepository):
         created = row[7]
         return Problem.from_record(id, grade, chapter, book, num_choice, ans_mcq, ans_saq, created)
     
-    def query(self) -> list:
+    def query_all(self) -> list:
         return super().query(f'SELECT * FROM {self.table_name} ORDER BY created DESC')
+    
+    def query(self, book, grade, chapter) -> list:
+        return super().query(f'SELECT * FROM {self.table_name} WHERE book = "{book}" AND grade = {grade} AND chapter = "{chapter}" ORDER BY created DESC')
     
     def insert(self, problem: Problem):
         super().insert(problem.to_record(), problem.id == -1)

@@ -3,6 +3,7 @@ from common.LiveData import *
 from data.common.ListRepository import *
 from data.common.ListDictRepository import *
 from data.Problem import *
+from data.BookRepository import *
 from data.ProblemRepository import *
 from data.ChapterRepository import *
 
@@ -18,26 +19,38 @@ class ProblemViewModel(QObject):
 
     event: pyqtSignal = pyqtSignal(Event)
 
-    problem_repository: ProblemRepository
+    book_repository: BookRepository
     chapter_repository: ChapterRepository
+    problem_repository: ProblemRepository
+
+    book_list: list
+    current_book_index: MutableLiveData
+    current_book: LiveData
 
     grade_list: list
-    current_grade_idx: MutableLiveData
+    current_grade_index: MutableLiveData
     current_grade: LiveData
 
     chapter_list: LiveData
     current_chapter_index: MutableLiveData
     current_chapter: LiveData
 
+    problem_list: LiveData
+
     def __init__(self):
         super().__init__()
-        self.problem_repository = ProblemRepository()
+        self.book_repository = BookRepository()
         self.chapter_repository = ChapterRepository()
+        self.problem_repository = ProblemRepository()
+
+        self.book_list = self.book_repository.get_list()
+        self.current_book_index = MutableLiveData(-1)
+        self.current_book = map(self.current_book_index, lambda i: self.book_list[i] if i != -1 else None)
 
         self.grade_list = [ i for i in range(6, 12)]
 
-        self.current_grade_idx = MutableLiveData(-1)
-        self.current_grade = map(self.current_grade_idx, 
+        self.current_grade_index = MutableLiveData(-1)
+        self.current_grade = map(self.current_grade_index, 
                                  lambda i: self.grade_list[i] if i != -1 else None)
 
         self.chapter_list = map(self.current_grade, 
@@ -46,9 +59,19 @@ class ProblemViewModel(QObject):
         self.current_chapter_index = MutableLiveData(-1)
         self.current_chapter = map2(self.chapter_list, self.current_chapter_index, 
                                  lambda chapters, i: chapters[i] if i > -1 and i < len(chapters) else None)
+        
+        self.problem_list = map3(self.current_book, self.current_grade, self.current_chapter,
+                                 lambda book, grade, chapter: self.problem_repository.query(book, grade, chapter) 
+                                 if None not in (book, grade, chapter) else [])
 
     def on_resume(self):
         pass
 
+    def on_book_change(self, index):
+        self.current_book_index.set_value(index)
+
     def on_grade_change(self, index):
-        self.current_grade_idx.set_value(index)
+        self.current_grade_index.set_value(index)
+
+    def on_chapter_change(self, index):
+        self.current_chapter_index.set_value(index)

@@ -37,12 +37,13 @@ class ProblemFragment(Fragment):
 
         self.view_model.event.connect(self.on_event)
 
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+
+        self.view_model.event.connect(self.on_event)
+
     def on_resume(self):
         self.view_model.on_resume()
-
-    def on_event(self, event: ProblemViewModel.Event):
-        if (isinstance(event, ProblemViewModel.ConfirmDeleteStudent)):
-            pass
 
     def update_chapter_combo(self, chapters):
         self.combo_chapter.clear()
