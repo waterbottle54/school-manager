@@ -1,32 +1,13 @@
-from PyQt5.QtCore import QObject, pyqtSignal
-from common.LiveData import *
 from data.common.ListRepository import *
-from data.common.ListDictRepository import *
-from data.Problem import *
+from common.Utils import *
+from common.LiveData import *
+import numpy as np
+from data.Student import *
 from data.BookRepository import *
 from data.ProblemRepository import *
 from data.ChapterRepository import *
 
-class ProblemViewModel(QObject):
-
-    class Event:
-        pass
-
-    class PromptProblemHeader(Event):
-        grade: int
-        chapter: str
-        book: str
-        def __init__(self, grade: int, chapter: str, book: str):
-            self.grade = grade
-            self.chapter = chapter
-            self.book = book
-
-    class ConfirmDeleteProblem(Event):
-        problem: Problem
-        def __init__(self, problem: Problem):
-            self.problem = problem
-
-    event: pyqtSignal = pyqtSignal(Event)
+class PromptProblemHeaderViewModel:
 
     book_repository: BookRepository
     chapter_repository: ChapterRepository
@@ -44,10 +25,13 @@ class ProblemViewModel(QObject):
     current_chapter_index: MutableLiveData
     current_chapter: LiveData
 
-    problem_list: LiveData
+    current_title: MutableLiveData
+
+    is_input_valid: LiveData
 
     def __init__(self):
         super().__init__()
+
         self.book_repository = BookRepository()
         self.chapter_repository = ChapterRepository()
         self.problem_repository = ProblemRepository()
@@ -69,27 +53,24 @@ class ProblemViewModel(QObject):
         self.current_chapter = map2(self.chapter_list, self.current_chapter_index, 
                                  lambda chapters, i: chapters[i] if i > -1 and i < len(chapters) else None)
         
-        self.problem_list = map3(self.current_book, self.current_grade, self.current_chapter,
-                                 lambda book, grade, chapter: self.problem_repository.query(book, grade, chapter) 
-                                 if None not in (book, grade, chapter) else [])
+        self.current_title = MutableLiveData("")
 
-    def on_resume(self):
-        pass
+        self.is_input_valid = map4(self.current_grade, self.current_book, self.current_chapter, self.current_title,
+                                   lambda grade, book, chapter, title: None not in (grade, book, chapter) and len(title) > 0)
 
-    def on_book_change(self, index):
-        self.current_book_index.set_value(index)
+    def on_grade_change(self, i):
+        if i >= 0 and i < len(self.grade_list):
+            self.current_grade_index.set_value(self.grade_list[i])
 
-    def on_grade_change(self, index):
-        self.current_grade_index.set_value(index)
+    def on_chapter_change(self, i):
+        list = self.chapter_list.value
+        if list is not None and i >= 0 and i < len(list):
+            self.current_chapter_index.set_value(list[i])
 
-    def on_chapter_change(self, index):
-        self.current_chapter_index.set_value(index)
+    def on_book_change(self, i):
+        list = self.book_list.value
+        if list is not None and i >= 0 and i < len(list):
+            self.current_book_index.set_value(list[i])
 
-    def on_add_problem_click(self):
-        grade = self.current_grade.value
-        chapter = self.current_chapter.value
-        book = self.current_book.value
-        self.event.emit(ProblemViewModel.PromptProblemHeader(grade, chapter, book))
-
-    def on_delete_problem_click(self):
-        pass
+    def on_title_change(self, text: str):
+        self.current_title.set_value(text.strip())

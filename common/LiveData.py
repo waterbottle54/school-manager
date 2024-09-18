@@ -49,3 +49,11 @@ def map3(source1, source2, source3, t):
     source2.observe(lambda value: data._set_value(t(source1.value, value, source3.value)))
     source3.observe(lambda value: data._set_value(t(source1.value, source2.value, value)))
     return data
+
+def map4(source1, source2, source3, source4, t):
+    data = LiveData(None)
+    source1.observe(lambda value: data._set_value(t(value, source2.value, source3.value, source4.value)))
+    source2.observe(lambda value: data._set_value(t(source1.value, value, source3.value, source4.value)))
+    source3.observe(lambda value: data._set_value(t(source1.value, source2.value, value, source4.value)))
+    source4.observe(lambda value: data._set_value(t(source1.value, source2.value, source3.value, value)))
+    return data
