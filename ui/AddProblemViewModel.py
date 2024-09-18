@@ -14,25 +14,12 @@ class AddProblemViewModel(QObject):
 
     event: pyqtSignal = pyqtSignal(Event)
 
-    book_repository: BookRepository
-    chapter_repository: ChapterRepository
-    problem_repository: ProblemRepository
-
-    book_list: list
-    current_book_index: MutableLiveData
-    current_book: LiveData
-
-    grade_list: list
-    current_grade_index: MutableLiveData
-    current_grade: LiveData
-
-    chapter_list: LiveData
-    current_chapter_index: MutableLiveData
-    current_chapter: LiveData
-
-    problem_list: LiveData
-
     def __init__(self):
         super().__init__()
+    
+    def on_resume(self):
+        pass
 
+    def on_upload_picture_1_click(self):
+        pass
         

@@ -9,6 +9,8 @@ from ui.StudentFragment import *
 from ui.StudentViewModel import *
 from ui.ProblemFragment import *
 from ui.ProblemViewModel import *
+from ui.AddProblemFragment import *
+from ui.AddProblemViewModel import *
 
 class MainWindow(QMainWindow):
 
@@ -34,6 +36,10 @@ class MainWindow(QMainWindow):
 
     problem_fragment: ProblemFragment
     problem_view_model: ProblemViewModel
+
+    add_problem_fragment: AddProblemFragment
+    add_problem_view_model: AddProblemViewModel
+
 
     def __init__(self):
         super().__init__()
@@ -65,6 +71,9 @@ class MainWindow(QMainWindow):
         self.problem_view_model = ProblemViewModel()
         self.problem_fragment = ProblemFragment("문제", self.problem_view_model)
 
+        self.add_problem_view_model = AddProblemViewModel()
+        self.add_problem_fragment = AddProblemFragment("문제 추가", self.add_problem_view_model)
+
         self.back_stack = list()
         self.navigate(self.home_fragment)
 
@@ -73,6 +82,7 @@ class MainWindow(QMainWindow):
         self.admin_view_model.event.connect(self.on_admin_event)
         self.data_view_model.event.connect(self.on_data_event)
         self.student_view_model.event.connect(self.on_student_event)
+        self.problem_view_model.event.connect(self.on_problem_event)
 
     def setup_toolbar(self):
         self.layout_toolbar = QHBoxLayout()
@@ -151,6 +161,11 @@ class MainWindow(QMainWindow):
 
     def on_student_event(self, event):
         pass
+
+    def on_problem_event(self, event):
+        if isinstance(event, ProblemViewModel.NavigateToAddProblem):
+            self.add_problem_fragment.set_problem_header(event.header)
+            self.navigate(self.add_problem_fragment)
 
     def set_stylesheet(self):
         with open('update_style.qss') as f:

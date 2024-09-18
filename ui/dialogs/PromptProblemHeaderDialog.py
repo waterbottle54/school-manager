@@ -96,7 +96,7 @@ class PromptProblemHeaderDialog(QDialog):
         self.button_cancel.clicked.connect(self.reject)
         self.layout_button.addWidget(self.button_cancel)
 
-    def get_problem_header(self) -> Student:
+    def get_problem_header(self) -> ProblemHeader:
         if self.view_model.is_input_valid.value is False:
             return None
         grade = self.view_model.current_grade.value

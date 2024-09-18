@@ -1,11 +1,12 @@
 from data.common.DatabaseConnection import *
 from data.common.DatabaseRepository import *
 from data.Problem import *
+from data.ProblemHeader import *
 
 class ProblemRepository(DatabaseRepository):
 
     def __init__(self):
-            super().__init__('db_app', 'problem', 'p_id')
+            super().__init__('db_app', 'problem', 'p_id', 1)
 
     def on_create_table(self, db):
         db.cursor.execute(f'''
@@ -14,10 +15,11 @@ class ProblemRepository(DatabaseRepository):
             grade INTEGER NOT NULL,
             chapter TEXT NOT NULL,
             book TEXT NOT NULL,
+            title TEXT NOT NULL,
             num_choice INTEGER NOT NULL,
             ans_mcq TEXT NOT NULL,
             ans_saq TEXT NOT NULL,
-            created INTEGER                 
+            created INTEGER      
         )''')
 
     def to_object(self, row):
@@ -25,11 +27,12 @@ class ProblemRepository(DatabaseRepository):
         grade = row[1]
         chapter = row[2]
         book = row[3]
-        num_choice = row[4]
-        ans_mcq = row[5]
-        ans_saq = row[6]
-        created = row[7]
-        return Problem.from_record(id, grade, chapter, book, num_choice, ans_mcq, ans_saq, created)
+        title = row[4]
+        num_choice = row[5]
+        ans_mcq = row[6]
+        ans_saq = row[7]
+        created = row[8]
+        return Problem.from_record(id, grade, chapter, book, title, num_choice, ans_mcq, ans_saq, created)
     
     def query_all(self) -> list:
         return super().query(f'SELECT * FROM {self.table_name} ORDER BY created DESC')
@@ -37,6 +40,9 @@ class ProblemRepository(DatabaseRepository):
     def query(self, book, grade, chapter) -> list:
         return super().query(f'SELECT * FROM {self.table_name} WHERE book = "{book}" AND grade = {grade} AND chapter = "{chapter}" ORDER BY created DESC')
     
+    def query_by_header(self, h: ProblemHeader) -> list:
+         return super().query(f'SELECT * FROM {self.table_name} WHERE book = "{h.book}" AND grade = {h.grade} AND chapter = "{h.chapter}" AND title = "{h.title}"')
+
     def insert(self, problem: Problem):
         super().insert(problem.to_record(), problem.id == -1)
 

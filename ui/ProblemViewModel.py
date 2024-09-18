@@ -27,6 +27,12 @@ class ProblemViewModel(QObject):
         def __init__(self, problem: Problem):
             self.problem = problem
 
+    class NavigateToAddProblem(Event):
+        header: ProblemHeader
+        def __init__(self, header: ProblemHeader) -> None:
+            super().__init__()
+            self.header = header
+
     event: pyqtSignal = pyqtSignal(Event)
 
     book_repository: BookRepository
@@ -54,12 +60,12 @@ class ProblemViewModel(QObject):
         self.problem_repository = ProblemRepository()
 
         self.book_list = self.book_repository.get_list()
-        self.current_book_index = MutableLiveData(-1)
+        self.current_book_index = MutableLiveData(1)
         self.current_book = map(self.current_book_index, lambda i: self.book_list[i] if i != -1 else None)
 
         self.grade_list = [ i for i in range(6, 12)]
 
-        self.current_grade_index = MutableLiveData(-1)
+        self.current_grade_index = MutableLiveData(2)
         self.current_grade = map(self.current_grade_index, 
                                  lambda i: self.grade_list[i] if i != -1 else None)
 
@@ -95,7 +101,9 @@ class ProblemViewModel(QObject):
     def on_problem_header_result(self, problem_header: ProblemHeader):
         if problem_header is None:
             return
-        print(problem_header.grade, problem_header.chapter, problem_header.book, problem_header.title)
+        existing = self.problem_repository.query_by_header(problem_header)
+        if len(existing) == 0:
+            self.event.emit(ProblemViewModel.NavigateToAddProblem(problem_header))
 
     def on_delete_problem_click(self):
         pass

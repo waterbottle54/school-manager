@@ -46,3 +46,7 @@ QHeaderView::section {
 QTableWidget {
     gridline-color: #e0e0e0;     /* Light gray grid lines for a soft look */
 }
+
+QLabel#picture {
+    border: 1px solid black;
+}

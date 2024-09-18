@@ -47,7 +47,7 @@ class ProblemFragment(Fragment):
             if dialog.exec_() == QDialog.Accepted:
                 problem_header = dialog.get_problem_header()
                 self.view_model.on_problem_header_result(problem_header)
-        elif (isinstance(event, ProblemViewModel.ConfirmDeleteStudent)):
+        elif (isinstance(event, ProblemViewModel.ConfirmDeleteProblem)):
             pass
 
     def update_chapter_combo(self, chapters):

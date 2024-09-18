@@ -5,7 +5,7 @@ from data.Student import *
 class StudentRepository(DatabaseRepository):
 
     def __init__(self):
-        super().__init__('db_app', 'student', 's_id')
+        super().__init__('db_app', 'student', 's_id', 1)
 
     def on_create_table(self, db):
         db.cursor.execute(f'''

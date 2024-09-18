@@ -7,17 +7,19 @@ class Problem:
     grade: int
     chapter: str
     book: str
+    title: str
     num_choice: int
     ans_mcq: list       # answers for a multicle choice question
     ans_saq: dict       # answers for a short-answer question (key is description for subquestions)
     created: int
 
-    def __init__(self, grade: int, chapter: str, book: str, num_choice: int, 
-                 ans_msq: list, ans_saq: dict, id=-1, created=int(time())):
+    def __init__(self, grade: int, chapter: str, book: str, title: str, 
+                 num_choice: int, ans_msq: list, ans_saq: dict, id=-1, created=int(time())):
         self.id = id
         self.grade = grade
         self.chapter = chapter
         self.book = book
+        self.title = title
         self.num_choice = num_choice
         self.ans_mcq = ans_msq
         self.ans_saq = ans_saq
@@ -34,19 +36,21 @@ class Problem:
             'grade': self.grade,
             'chapter': self.chapter,
             'book': self.book,
+            'title': self.title,
             'num_choice': self.num_choice,
             'ans_mcq': json.dump(self.ans_mcq),
             'ans_saq': json.dump(self.ans_saq),
             'created': self.created
         }
     
-    def from_record(id: int, grade: int, chapter: str, book: str, 
+    def from_record(id: int, grade: int, chapter: str, book: str, title: str,
                     num_choice: int, json_ans_mcq: str, json_ans_saq: str, created: int):
         problem = Problem(0,'','',0,[],{})
         problem.id = id
         problem.grade = grade
         problem.chapter = chapter
         problem.book = book
+        problem.title = title
         problem.num_choice = num_choice
         problem.ans_mcq = json.load(json_ans_mcq)
         problem.ans_saq = json.load(json_ans_saq)
