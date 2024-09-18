@@ -1,7 +1,7 @@
 import sys
 import shutil
 import os
-from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QSpinBox, QPushButton)
+from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QSpinBox, QPushButton, QRadioButton, QButtonGroup)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
@@ -24,11 +24,14 @@ class AddProblemFragment(Fragment):
         self.setLayout(self.layout)
 
         self.setup_picture_section()
+        self.layout.addSpacing(16)
         self.setup_form_section()
 
         self.view_model.full_title.observe(self.update_title)
         self.view_model.image_path_1.observe(lambda image_path: self.update_picture(image_path, self.label_picture_1))
         self.view_model.image_path_2.observe(lambda image_path: self.update_picture(image_path, self.label_picture_2))
+
+        self.view_model.problem_type.observe(lambda type: self.group_type.button(type).setChecked(True))
 
         self.view_model.event.connect(self.on_event)
 
@@ -75,12 +78,45 @@ class AddProblemFragment(Fragment):
         self.layout_form = QVBoxLayout()
         self.layout.addLayout(self.layout_form)
 
+        # radio group for problem type
+        self.layout_type = QHBoxLayout()
+        self.layout_form.addLayout(self.layout_type)
+
+        self.radio_mcq = QRadioButton('객관식')
+        self.layout_type.addWidget(self.radio_mcq)
+
+        self.radio_saq = QRadioButton('주관식')
+        self.layout_type.addWidget(self.radio_saq)
+        
+        self.group_type = QButtonGroup()
+        self.group_type.addButton(self.radio_mcq, 0)
+        self.group_type.addButton(self.radio_saq, 1)
+        self.group_type.buttonClicked[int].connect(self.view_model.on_type_click)
+
+        self.radio_mcq.setChecked(True)
+
+        #
         self.spinner = QSpinBox()
         self.spinner.setRange(3, 8)
         self.spinner.setSingleStep(1)
         self.spinner.setValue(5)
-
         self.layout_form.addWidget(self.spinner)
+
+        self.layout_form.addStretch(1)
+
+        # buttons (submit, cancel)
+        self.layout_button = QHBoxLayout()
+        self.layout_form.addLayout(self.layout_button)
+
+        self.button_cancel = QPushButton('취소')
+        self.button_cancel.setObjectName('modify')
+        self.button_cancel.clicked.connect(self.view_model.on_cancel_click)
+        self.layout_button.addWidget(self.button_cancel)
+
+        self.button_submit = QPushButton('등록')
+        self.button_submit.setObjectName('modify')
+        self.button_submit.clicked.connect(self.view_model.on_submit_click)
+        self.layout_button.addWidget(self.button_submit)
 
     def on_resume(self):
         self.view_model.on_resume()

@@ -48,5 +48,14 @@ QTableWidget {
 }
 
 QLabel#picture {
-    border: 1px solid black;
+    background-color: #ffffff; /* Light gray background */
+    border: 2px solid #cbcbcb; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px; /* Padding inside the label */
+}
+
+QListWidget, QTableWidget {
+    background-color: #ffffff; /* Light gray background */
+    border: 2px solid #cbcbcb; /* Subtle border */
+    border-radius: 4px; /* Rounded corners */
 }

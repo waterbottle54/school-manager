@@ -36,12 +36,15 @@ class AddProblemViewModel(QObject):
     image_path_1: MutableLiveData
     image_path_2: MutableLiveData
 
+    problem_type: MutableLiveData
+
 
     def __init__(self):
         super().__init__()
         self.full_title = MutableLiveData("")
         self.image_path_1 = MutableLiveData(None)
         self.image_path_2 = MutableLiveData(None)
+        self.problem_type = MutableLiveData(0)
     
     def on_resume(self):
         pass
@@ -63,7 +66,16 @@ class AddProblemViewModel(QObject):
             self.image_path_2.set_value(image_path)
 
         header = self.problem_header
-        folder_name = f'{header.book} {of_grade(header.grade)}-{header.chapter}'
+        folder_name = f'image_prob/{header.book}_{of_grade(header.grade)}_{header.chapter}'
         file_name = f'{header.title}_{sequence}'
 
         self.event.emit(AddProblemViewModel.MakeCopyImage(image_path, folder_name, file_name))
+
+    def on_type_click(self, type):
+        self.problem_type.set_value(type)
+
+    def on_submit_click(self):
+        pass
+
+    def on_cancel_click(self):
+        pass
