@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
 from ui.StudentViewModel import *
 from ui.common.UiUtils import *
-from ui.AddStudentDialog import *
+from ui.dialogs.AddStudentDialog import *
 from common.StringRes import *
 
 class StudentFragment(Fragment):
@@ -34,7 +34,7 @@ class StudentFragment(Fragment):
 
         self.view_model.student_list.observe(self.update_student_list)
         self.view_model.student_index.observe(self.update_student_selection)
-        self.view_model.can_delete_student.observe(lambda can: self.button_delete_student.setEnabled(can))
+        self.view_model.can_delete_student.observe(self.button_delete_student.setEnabled)
         self.view_model.current_student.observe(self.update_student_detail)
 
         self.view_model.event.connect(self.on_event)

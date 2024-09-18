@@ -4,7 +4,7 @@ from ui.common.Fragment import *
 from ui.common.UiUtils import *
 from common.StringRes import *
 from ui.ProblemViewModel import *
-from ui.PromptProblemHeaderDialog import *
+from ui.dialogs.PromptProblemHeaderDialog import *
 
 class ProblemFragment(Fragment):
 
@@ -43,11 +43,10 @@ class ProblemFragment(Fragment):
 
     def on_event(self, event: ProblemViewModel.Event):
         if (isinstance(event, ProblemViewModel.PromptProblemHeader)):
-            dialog = PromptProblemHeaderDialog()
+            dialog = PromptProblemHeaderDialog(event.grade, event.chapter, event.book)
             if dialog.exec_() == QDialog.Accepted:
                 problem_header = dialog.get_problem_header()
-                if problem_header is not None:
-                    self.view_model.on_problem_header_result(problem_header)
+                self.view_model.on_problem_header_result(problem_header)
         elif (isinstance(event, ProblemViewModel.ConfirmDeleteStudent)):
             pass
 
@@ -87,9 +86,11 @@ class ProblemFragment(Fragment):
 
         # buttons
         self.button_add_problem = QPushButton('문제 등록')
+        self.button_add_problem.setObjectName('modify')
         self.button_add_problem.clicked.connect(self.view_model.on_add_problem_click)
 
         self.button_delete_problem = QPushButton('문제 삭제')
+        self.button_delete_problem.setObjectName('modify')
         self.button_delete_problem.clicked.connect(self.view_model.on_delete_problem_click)
 
         self.layout_buttons.addWidget(self.button_add_problem)

@@ -1,4 +1,3 @@
-import sys
 from PyQt5.QtWidgets import (QDialog, QLabel, QLineEdit, QComboBox,
                              QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy)
 from data.common.ListRepository import *

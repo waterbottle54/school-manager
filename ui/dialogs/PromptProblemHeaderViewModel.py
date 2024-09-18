@@ -1,7 +1,6 @@
 from data.common.ListRepository import *
 from common.Utils import *
 from common.LiveData import *
-import numpy as np
 from data.Student import *
 from data.BookRepository import *
 from data.ProblemRepository import *
@@ -28,9 +27,12 @@ class PromptProblemHeaderViewModel:
     current_title: MutableLiveData
 
     is_input_valid: LiveData
+    init_chapter = None
 
-    def __init__(self):
+    def __init__(self, init_grade, init_chapter, init_book):
         super().__init__()
+
+        self.init_chapter = init_chapter
 
         self.book_repository = BookRepository()
         self.chapter_repository = ChapterRepository()
@@ -58,19 +60,33 @@ class PromptProblemHeaderViewModel:
         self.is_input_valid = map4(self.current_grade, self.current_book, self.current_chapter, self.current_title,
                                    lambda grade, book, chapter, title: None not in (grade, book, chapter) and len(title) > 0)
 
+        if init_grade in self.grade_list:
+            i = self.grade_list.index(init_grade)
+            self.current_grade_index.set_value(i)
+        
+        if self.book_list is not None and init_book in self.book_list:
+            i = self.book_list.index(init_book)
+            self.current_book_index.set_value(i)
+
+    def on_tick(self):
+        _chapter_list = self.chapter_list.value
+        if _chapter_list is not None and self.init_chapter in _chapter_list:
+            i = _chapter_list.index(self.init_chapter)
+            self.current_chapter_index.set_value(i)
+
     def on_grade_change(self, i):
         if i >= 0 and i < len(self.grade_list):
-            self.current_grade_index.set_value(self.grade_list[i])
+            self.current_grade_index.set_value(i)
 
     def on_chapter_change(self, i):
         list = self.chapter_list.value
         if list is not None and i >= 0 and i < len(list):
-            self.current_chapter_index.set_value(list[i])
+            self.current_chapter_index.set_value(i)
 
     def on_book_change(self, i):
-        list = self.book_list.value
+        list = self.book_list
         if list is not None and i >= 0 and i < len(list):
-            self.current_book_index.set_value(list[i])
+            self.current_book_index.set_value(i)
 
     def on_title_change(self, text: str):
         self.current_title.set_value(text.strip())

@@ -1,4 +1,4 @@
-from Problem import *
+from data.Problem import *
 
 class ProblemHeader:
     grade: int

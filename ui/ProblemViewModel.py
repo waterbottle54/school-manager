@@ -6,6 +6,7 @@ from data.Problem import *
 from data.BookRepository import *
 from data.ProblemRepository import *
 from data.ChapterRepository import *
+from data.ProblemHeader import *
 
 class ProblemViewModel(QObject):
 
@@ -90,6 +91,11 @@ class ProblemViewModel(QObject):
         chapter = self.current_chapter.value
         book = self.current_book.value
         self.event.emit(ProblemViewModel.PromptProblemHeader(grade, chapter, book))
+
+    def on_problem_header_result(self, problem_header: ProblemHeader):
+        if problem_header is None:
+            return
+        print(problem_header.grade, problem_header.chapter, problem_header.book, problem_header.title)
 
     def on_delete_problem_click(self):
         pass
