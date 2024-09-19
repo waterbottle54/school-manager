@@ -24,6 +24,7 @@ class PromptProblemHeaderDialog(QDialog):
         self.view_model.is_input_valid.observe(self.button_submit.setEnabled)
 
         QTimer.singleShot(100, self.view_model.on_tick)
+        self.edit_title.setFocus()
 
     def update_chapter_combo(self, chapters):
         self.combo_chapter.clear()

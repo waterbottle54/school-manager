@@ -1,7 +1,8 @@
 import sys
 import shutil
 import os
-from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QSpinBox, QPushButton, QRadioButton, QButtonGroup)
+from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QStackedWidget,
+                              QPushButton, QRadioButton, QCheckBox, QButtonGroup, QComboBox)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
@@ -23,20 +24,35 @@ class AddProblemFragment(Fragment):
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
-        self.setup_picture_section()
+        self.layout_picture = self.create_picture_layout()
+        self.layout.addLayout(self.layout_picture, stretch=3)
+
         self.layout.addSpacing(16)
-        self.setup_form_section()
+
+        self.layout_form = self.create_form_layout()
+        self.layout.addLayout(self.layout_form, stretch=2)
 
         self.view_model.full_title.observe(self.update_title)
         self.view_model.image_path_1.observe(lambda image_path: self.update_picture(image_path, self.label_picture_1))
         self.view_model.image_path_2.observe(lambda image_path: self.update_picture(image_path, self.label_picture_2))
-
-        self.view_model.problem_type.observe(lambda type: self.group_type.button(type).setChecked(True))
+        self.view_model.problem_type.observe(self.update_problem_type)
+        self.view_model.current_num_choice.observe(self.update_num_choice)
 
         self.view_model.event.connect(self.on_event)
 
     def update_title(self, title):
         self.title = title if title is not None else ""
+
+    def update_problem_type(self, type):
+        self.bgroup_type.button(type).setChecked(True)
+        self.stacked_widget.setCurrentIndex(type)
+
+    def update_num_choice(self, num_choice):
+        index = num_choice - self.view_model.range_num_choice.start
+        self.combo_num_choice.setCurrentIndex(index)
+        for i, button_choice in enumerate(self.list_button_choice):
+            button_choice.setVisible(i < num_choice)
+            button_choice.setChecked(False)
 
     def update_picture(self, image_path, label):
         label.clear()
@@ -46,9 +62,8 @@ class AddProblemFragment(Fragment):
                 scaled = pixmap.scaled(label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 label.setPixmap(scaled)
       
-    def setup_picture_section(self):
+    def create_picture_layout(self):
         self.layout_picture = QHBoxLayout()
-        self.layout.addLayout(self.layout_picture)
 
         self.layout_picture_1 = QVBoxLayout()
         self.layout_picture_2 = QVBoxLayout()
@@ -74,34 +89,37 @@ class AddProblemFragment(Fragment):
         self.layout_picture_2.addWidget(self.label_picture_2)
         self.layout_picture_2.addWidget(self.button_upload_picture_2)
 
-    def setup_form_section(self):
-        self.layout_form = QVBoxLayout()
-        self.layout.addLayout(self.layout_form)
+        return self.layout_picture
 
-        # radio group for problem type
+    def create_form_layout(self):
+        self.layout_form = QVBoxLayout()
+
+        # radios for problem type
         self.layout_type = QHBoxLayout()
         self.layout_form.addLayout(self.layout_type)
 
         self.radio_mcq = QRadioButton('객관식')
-        self.layout_type.addWidget(self.radio_mcq)
-
         self.radio_saq = QRadioButton('주관식')
+        self.layout_type.addWidget(self.radio_mcq)
         self.layout_type.addWidget(self.radio_saq)
         
-        self.group_type = QButtonGroup()
-        self.group_type.addButton(self.radio_mcq, 0)
-        self.group_type.addButton(self.radio_saq, 1)
-        self.group_type.buttonClicked[int].connect(self.view_model.on_type_click)
+        self.bgroup_type = QButtonGroup()
+        self.bgroup_type.addButton(self.radio_mcq, 0)
+        self.bgroup_type.addButton(self.radio_saq, 1)
+        self.bgroup_type.buttonClicked[int].connect(self.view_model.on_type_click)
 
-        self.radio_mcq.setChecked(True)
+        self.layout_form.addSpacing(32)
 
-        #
-        self.spinner = QSpinBox()
-        self.spinner.setRange(3, 8)
-        self.spinner.setSingleStep(1)
-        self.spinner.setValue(5)
-        self.layout_form.addWidget(self.spinner)
+        # stacked widget to show proper page in accordance with selected problem type
+        self.stacked_widget = QStackedWidget()
+        self.layout_form.addWidget(self.stacked_widget)
 
+        self.page_mcq = self.create_mcq_page()
+        self.page_saq = self.create_saq_page()
+        self.stacked_widget.addWidget(self.page_mcq)
+        self.stacked_widget.addWidget(self.page_saq)
+
+        # stretch
         self.layout_form.addStretch(1)
 
         # buttons (submit, cancel)
@@ -117,6 +135,41 @@ class AddProblemFragment(Fragment):
         self.button_submit.setObjectName('modify')
         self.button_submit.clicked.connect(self.view_model.on_submit_click)
         self.layout_button.addWidget(self.button_submit)
+
+        return self.layout_form
+
+    def create_mcq_page(self) -> QWidget:
+        self.page_mcq = QWidget()
+        self.layout_mcq = QVBoxLayout()
+        self.page_mcq.setLayout(self.layout_mcq)
+
+        self.combo_num_choice = QComboBox()
+        self.combo_num_choice.setFixedWidth(200)
+        self.combo_num_choice.addItems([f'{i}' for i in self.view_model.range_num_choice])
+        self.combo_num_choice.activated.connect(self.view_model.on_num_choice_change)
+        self.layout_mcq.addWidget(self.combo_num_choice)
+
+        self.layout_mcq.addSpacing(16)
+
+        self.layout_choices = QHBoxLayout()
+        self.layout_mcq.addLayout(self.layout_choices)
+
+        self.bgroup_choice = QButtonGroup()
+        self.bgroup_choice.setExclusive(False)
+        max_num_choice = self.view_model.range_num_choice.stop
+        self.list_button_choice = [ QCheckBox(f'{i+1}') for i in range(max_num_choice) ]
+        for button_choice in self.list_button_choice:
+            self.layout_choices.addWidget(button_choice)
+            self.bgroup_choice.addButton(button_choice)
+
+        return self.page_mcq
+
+    def create_saq_page(self):
+        self.page_saq = QWidget()
+        self.layout_saq = QVBoxLayout()
+        self.page_saq.setLayout(self.layout_saq)
+
+        return self.page_saq
 
     def on_resume(self):
         self.view_model.on_resume()

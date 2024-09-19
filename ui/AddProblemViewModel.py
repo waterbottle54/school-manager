@@ -38,6 +38,9 @@ class AddProblemViewModel(QObject):
 
     problem_type: MutableLiveData
 
+    range_num_choice: range
+    current_num_choice: MutableLiveData
+
 
     def __init__(self):
         super().__init__()
@@ -45,6 +48,9 @@ class AddProblemViewModel(QObject):
         self.image_path_1 = MutableLiveData(None)
         self.image_path_2 = MutableLiveData(None)
         self.problem_type = MutableLiveData(0)
+
+        self.range_num_choice = range(3, 9)
+        self.current_num_choice = MutableLiveData(5)
     
     def on_resume(self):
         pass
@@ -73,6 +79,9 @@ class AddProblemViewModel(QObject):
 
     def on_type_click(self, type):
         self.problem_type.set_value(type)
+
+    def on_num_choice_change(self, num):
+        self.current_num_choice.set_value(self.range_num_choice.start + num)
 
     def on_submit_click(self):
         pass
