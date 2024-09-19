@@ -36,7 +36,9 @@ class AddProblemFragment(Fragment):
         self.view_model.image_path_1.observe(lambda image_path: self.update_picture(image_path, self.label_picture_1))
         self.view_model.image_path_2.observe(lambda image_path: self.update_picture(image_path, self.label_picture_2))
         self.view_model.problem_type.observe(self.update_problem_type)
-        self.view_model.current_num_choice.observe(self.update_num_choice)
+        self.view_model.current_num_choices.observe(self.update_num_choice)
+        self.view_model.answer_list_mcq.observe(self.update_choices)
+        self.view_model.is_input_valid.observe(self.button_submit.setEnabled)
 
         self.view_model.event.connect(self.on_event)
 
@@ -53,6 +55,10 @@ class AddProblemFragment(Fragment):
         for i, button_choice in enumerate(self.list_button_choice):
             button_choice.setVisible(i < num_choice)
             button_choice.setChecked(False)
+        
+    def update_choices(self, answer_list: list):
+        for i, button_choice in enumerate(self.list_button_choice):
+            button_choice.setChecked(i in answer_list)
 
     def update_picture(self, image_path, label):
         label.clear()
@@ -149,7 +155,7 @@ class AddProblemFragment(Fragment):
         self.combo_num_choice.activated.connect(self.view_model.on_num_choice_change)
         self.layout_mcq.addWidget(self.combo_num_choice)
 
-        self.layout_mcq.addSpacing(16)
+        self.layout_mcq.addSpacing(32)
 
         self.layout_choices = QHBoxLayout()
         self.layout_mcq.addLayout(self.layout_choices)
@@ -158,9 +164,11 @@ class AddProblemFragment(Fragment):
         self.bgroup_choice.setExclusive(False)
         max_num_choice = self.view_model.range_num_choice.stop
         self.list_button_choice = [ QCheckBox(f'{i+1}') for i in range(max_num_choice) ]
-        for button_choice in self.list_button_choice:
+        for i, button_choice in enumerate(self.list_button_choice):
             self.layout_choices.addWidget(button_choice)
-            self.bgroup_choice.addButton(button_choice)
+            self.bgroup_choice.addButton(button_choice, i)
+
+        self.bgroup_choice.buttonToggled.connect(self.on_choice_toggled)
 
         return self.page_mcq
 
@@ -179,6 +187,13 @@ class AddProblemFragment(Fragment):
             self.select_image(event.sequence)
         elif isinstance(event, AddProblemViewModel.MakeCopyImage):
             self.make_copy_image(event.image_path, event.folder_name, event.file_name)
+
+    def on_choice_toggled(self, _button, _checked):
+        list_chekced = []
+        for i, check_button in enumerate(self.list_button_choice):
+            if check_button.isChecked():
+                list_chekced.append(i)
+        self.view_model.on_choice_change(list_chekced)
 
     def set_problem_header(self, header: ProblemHeader):
         self.view_model.on_problem_header_set(header)

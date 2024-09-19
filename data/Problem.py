@@ -38,8 +38,8 @@ class Problem:
             'book': self.book,
             'title': self.title,
             'num_choice': self.num_choice,
-            'ans_mcq': json.dump(self.ans_mcq),
-            'ans_saq': json.dump(self.ans_saq),
+            'ans_mcq': json.dumps(self.ans_mcq),
+            'ans_saq': json.dumps(self.ans_saq),
             'created': self.created
         }
     
@@ -52,8 +52,8 @@ class Problem:
         problem.book = book
         problem.title = title
         problem.num_choice = num_choice
-        problem.ans_mcq = json.load(json_ans_mcq)
-        problem.ans_saq = json.load(json_ans_saq)
+        problem.ans_mcq = json.loads(json_ans_mcq)
+        problem.ans_saq = json.loads(json_ans_saq)
         problem.created = created
 
         for key, answer in problem.ans_saq.items():

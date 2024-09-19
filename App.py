@@ -83,6 +83,7 @@ class MainWindow(QMainWindow):
         self.data_view_model.event.connect(self.on_data_event)
         self.student_view_model.event.connect(self.on_student_event)
         self.problem_view_model.event.connect(self.on_problem_event)
+        self.add_problem_view_model.event.connect(self.on_add_problem_event)
 
     def setup_toolbar(self):
         self.layout_toolbar = QHBoxLayout()
@@ -166,6 +167,11 @@ class MainWindow(QMainWindow):
         if isinstance(event, ProblemViewModel.NavigateToAddProblem):
             self.add_problem_fragment.set_problem_header(event.header)
             self.navigate(self.add_problem_fragment)
+
+    def on_add_problem_event(self, event):
+        if isinstance(event, AddProblemViewModel.NavigateBackWithResult):
+            
+            self.navigate_back()
 
     def set_stylesheet(self):
         with open('update_style.qss') as f:
