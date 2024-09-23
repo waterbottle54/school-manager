@@ -32,7 +32,7 @@ class StudentFragment(Fragment):
         self.setup_student_table_sector()
         self.setup_student_detail_sector()
 
-        self.view_model.student_list.observe(self.update_student_list)
+        self.view_model.student_list.observe(self.update_student_table)
         self.view_model.student_index.observe(self.update_student_selection)
         self.view_model.can_delete_student.observe(self.button_delete_student.setEnabled)
         self.view_model.current_student.observe(self.update_student_detail)
@@ -48,7 +48,7 @@ class StudentFragment(Fragment):
         if (isinstance(event, StudentViewModel.ConfirmDeleteStudent)):
             self.confirm_delete_student(event.student)
 
-    def update_student_list(self, student_list):
+    def update_student_table(self, student_list):
         self.tw_student.setRowCount(len(student_list))
         for i, student in enumerate(student_list):
             student: Student
@@ -88,7 +88,6 @@ class StudentFragment(Fragment):
         self.tw_student.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tw_student.setSelectionMode(QTableWidget.SingleSelection)
         self.tw_student.setSelectionBehavior(QTableWidget.SelectRows)
-
         self.tw_student.verticalHeader().setVisible(False)
         self.tw_student.setHorizontalHeaderLabels(["학년", "이름", "학교"])
         

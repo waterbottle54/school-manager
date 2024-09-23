@@ -45,17 +45,10 @@ class Problem:
     
     def from_record(id: int, grade: int, chapter: str, book: str, title: str,
                     num_choice: int, json_ans_mcq: str, json_ans_saq: str, created: int):
-        problem = Problem(0,'','',0,[],{})
-        problem.id = id
-        problem.grade = grade
-        problem.chapter = chapter
-        problem.book = book
-        problem.title = title
-        problem.num_choice = num_choice
-        problem.ans_mcq = json.loads(json_ans_mcq)
-        problem.ans_saq = json.loads(json_ans_saq)
-        problem.created = created
-
+        ans_mcq = json.loads(json_ans_mcq)
+        ans_saq = json.loads(json_ans_saq)
+        problem = Problem(grade, chapter, book, title, num_choice, ans_mcq, ans_saq, id, created)
+        
         for key, answer in problem.ans_saq.items():
             answer: str
             answer = answer.replace('#comma#', ',').replace('#colon#', ':')

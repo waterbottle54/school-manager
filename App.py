@@ -170,7 +170,6 @@ class MainWindow(QMainWindow):
 
     def on_add_problem_event(self, event):
         if isinstance(event, AddProblemViewModel.NavigateBackWithResult):
-            
             self.navigate_back()
 
     def set_stylesheet(self):

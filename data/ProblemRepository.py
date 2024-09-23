@@ -38,7 +38,7 @@ class ProblemRepository(DatabaseRepository):
         return super().query(f'SELECT * FROM {self.table_name} ORDER BY created DESC')
     
     def query(self, book, grade, chapter) -> list:
-        return super().query(f'SELECT * FROM {self.table_name} WHERE book = "{book}" AND grade = {grade} AND chapter = "{chapter}" ORDER BY created DESC')
+        return super().query(f'SELECT * FROM {self.table_name} WHERE book = "{book}" AND grade = {grade} AND chapter = "{chapter}" ORDER BY CASE WHEN title NOT LIKE "%[^0-9]%" THEN CAST(title AS INT) ELSE 999999999 END ASC, title ASC')
     
     def query_by_header(self, h: ProblemHeader) -> list:
          return super().query(f'SELECT * FROM {self.table_name} WHERE book = "{h.book}" AND grade = {h.grade} AND chapter = "{h.chapter}" AND title = "{h.title}"')
