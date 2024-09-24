@@ -3,6 +3,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QSize
 from ui.common.Fragment import *
 from ui.DataViewModel import *
+from ui.common.Navigation import *
 from common.StringRes import *
 import numpy as np
 from PyQt5.QtCore import QTimer
@@ -21,10 +22,10 @@ class DataFragment(Fragment):
     lw_chapter: QListWidget
     cb_grade: QComboBox
 
-    def __init__(self, title, view_model):
+    def __init__(self, title):
         super().__init__(title)
 
-        self.view_model = view_model
+        self.view_model = DataViewModel()
         
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
@@ -60,11 +61,13 @@ class DataFragment(Fragment):
         self.view_model.on_resume()
 
     def on_event(self, event):
-        if isinstance(event, DataViewModel.PromptSchoolName):
+        if isinstance(event, DataViewModel.NavigateBack):
+            Navigation._instance.navigate_back()
+        elif isinstance(event, DataViewModel.PromptSchoolName):
             self.prompt_school_name()
-        if isinstance(event, DataViewModel.PromptBookName):
+        elif isinstance(event, DataViewModel.PromptBookName):
             self.prompt_book_name()
-        if isinstance(event, DataViewModel.PromptChapterName):
+        elif isinstance(event, DataViewModel.PromptChapterName):
             self.prompt_chapter_name(event.grade)
 
     def on_remove_school_click(self):
@@ -124,7 +127,7 @@ class DataFragment(Fragment):
            self.view_model.on_add_book_result(book_name)
 
     def prompt_chapter_name(self, grade):
-        chapter_name, ok = QInputDialog.getText(self, f'{of_grade(grade)} 단원 추가', '단원명')
+        chapter_name, ok = QInputDialog.getText(self, f'{grade_name(grade)} 단원 추가', '단원명')
         if ok == True:
             self.view_model.on_add_chapter_result(chapter_name)
 
@@ -170,7 +173,7 @@ class DataFragment(Fragment):
         self.layout_chapter.addWidget(title)
 
         self.cb_grade = QComboBox()
-        titles_grade = [ of_grade(g) for g in np.arange(0, 12) ]
+        titles_grade = [ grade_name(g) for g in np.arange(0, 12) ]
         self.cb_grade.addItems(titles_grade)
         self.cb_grade.currentIndexChanged.connect(lambda index: self.view_model.on_grade_change(index + 0))
         self.layout_chapter.addWidget(self.cb_grade)

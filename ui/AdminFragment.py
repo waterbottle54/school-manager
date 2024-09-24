@@ -3,17 +3,35 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QSize
 from ui.common.Fragment import *
 from ui.AdminViewModel import *
+from ui.DataFragment import *
+from ui.StudentFragment import *
+from ui.ProblemFragment import *
 
 class AdminFragment(Fragment):
 
     view_model: AdminViewModel
 
 
-    def __init__(self, title, view_model):
+    def __init__(self, title):
         super().__init__(title)
 
-        self.view_model = view_model
+        self.view_model = AdminViewModel()
         
+        self.setup_ui()
+
+        self.view_model.event.connect(self.on_event)
+
+    def on_event(self, event):
+        if isinstance(event, AdminViewModel.NavigateBack):
+            Navigation._instance.navigate_back()
+        elif isinstance(event, AdminViewModel.NavigateToDataFragment):
+            Navigation._instance.navigate(DataFragment)
+        elif isinstance(event, AdminViewModel.NavigateToStudentFragment):
+            Navigation._instance.navigate(StudentFragment)
+        elif isinstance(event, AdminViewModel.NavigateToProblemFragment):
+            Navigation._instance.navigate(ProblemFragment)
+
+    def setup_ui(self):
         layout_buttons = QGridLayout()
         self.setLayout(layout_buttons)
 
@@ -47,4 +65,3 @@ class AdminFragment(Fragment):
         layout_buttons.addWidget(button_problem, 0, 1)
         layout_buttons.addWidget(button_data, 1, 0)
         layout_buttons.addWidget(button_back, 1, 1)
-

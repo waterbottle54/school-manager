@@ -71,7 +71,7 @@ class PromptProblemHeaderDialog(QDialog):
 
         self.label_grade = QLabel("학년:")
         self.combo_grade = QComboBox()
-        items_grade = [ of_grade(i) for i in self.view_model.grade_list ]
+        items_grade = [ grade_name(i) for i in self.view_model.grade_list ]
         self.combo_grade.addItems(items_grade)
         self.combo_grade.currentIndexChanged.connect(self.view_model.on_grade_change)
         self.layout_grade.addWidget(self.label_grade)

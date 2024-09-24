@@ -6,6 +6,7 @@ from data.Problem import *
 from data.BookRepository import *
 from data.ProblemRepository import *
 from data.ChapterRepository import *
+from data.ImageRepository import *
 from data.ProblemHeader import *
 
 class ProblemViewModel(QObject):
@@ -28,10 +29,10 @@ class ProblemViewModel(QObject):
             self.problem = problem
 
     class NavigateToAddProblem(Event):
-        header: ProblemHeader
+        problem_header: ProblemHeader
         def __init__(self, header: ProblemHeader) -> None:
             super().__init__()
-            self.header = header
+            self.problem_header = header
 
     class ShowGeneralMessage(Event):
         message: str
@@ -43,6 +44,7 @@ class ProblemViewModel(QObject):
     book_repository: BookRepository
     chapter_repository: ChapterRepository
     problem_repository: ProblemRepository
+    image_repository: ImageRepository
 
     book_list: list
     current_book_index: MutableLiveData
@@ -60,12 +62,19 @@ class ProblemViewModel(QObject):
     current_problem_index: MutableLiveData
     current_problem: LiveData
     can_delete_problem: LiveData
+    can_modify_problem: LiveData
+
+    image_main: LiveData
+    image_sub: LiveData
+
+    range_num_choice: range
 
     def __init__(self):
         super().__init__()
         self.book_repository = BookRepository()
         self.chapter_repository = ChapterRepository()
         self.problem_repository = ProblemRepository()
+        self.image_repository = ImageRepository()
 
         self.book_list = self.book_repository.get_list()
         self.current_book_index = MutableLiveData(1)
@@ -92,6 +101,17 @@ class ProblemViewModel(QObject):
         self.current_problem = map2(self.problem_list, self.current_problem_index,
                                     lambda problems, i: problems[i] if i > -1 and i < len(problems) else None)
         self.can_delete_problem = map(self.current_problem, lambda problem: problem is not None)
+        self.can_modify_problem = map(self.current_problem, lambda problem: problem is not None)
+
+        self.image_main = map(self.current_problem,
+                            lambda problem: self.image_repository.load_problem_image(from_problem(problem), True) 
+                            if problem is not None else None)
+        
+        self.image_sub = map(self.current_problem,
+                        lambda problem: self.image_repository.load_problem_image(from_problem(problem), False) 
+                        if problem is not None else None)
+
+        self.range_num_choice = range(3, 9)
 
     def on_resume(self):
         self.current_chapter_index.publish()
@@ -134,3 +154,9 @@ class ProblemViewModel(QObject):
     def on_delete_probem_confirmed(self, problem: Problem):
         self.problem_repository.delete(problem.id)
         self.current_chapter_index.publish()
+
+    def on_modify_problem_click(self):
+        problem = self.current_problem.value
+        if problem is not None:
+            header = from_problem(problem)
+            self.event.emit(ProblemViewModel.NavigateToAddProblem(header))

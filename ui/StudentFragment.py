@@ -2,9 +2,11 @@ from PyQt5.QtWidgets import (QPushButton, QTableWidget, QVBoxLayout, QHBoxLayout
                              QTableWidgetItem, QAbstractItemView, QListWidget)
 from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
+from ui.AddProblemFragment import *
 from ui.StudentViewModel import *
 from ui.common.UiUtils import *
 from ui.dialogs.AddStudentDialog import *
+from ui.dialogs.PromptProblemHeaderDialog import *
 from common.StringRes import *
 
 class StudentFragment(Fragment):
@@ -13,10 +15,10 @@ class StudentFragment(Fragment):
 
     layout: QHBoxLayout
    
-    def __init__(self, title, view_model):
+    def __init__(self, title):
         super().__init__(title)
 
-        self.view_model = view_model
+        self.view_model = StudentViewModel()
         
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
@@ -42,23 +44,32 @@ class StudentFragment(Fragment):
     def on_resume(self):
         self.view_model.on_resume()
 
+        results = Navigation._instance.get_fragment_results(self)
+        if results is not None and 'problem' in results:
+            self.view_model.on_add_problem_result(results['problem'])
+
     def on_event(self, event: StudentViewModel.Event):
-        if (isinstance(event, StudentViewModel.PromptStudent)):
+        if isinstance(event, StudentViewModel.NavigateToAddProblemScreen):
+            arguments = {'problem_header': event.problem_header}
+            Navigation._instance.navigate(AddProblemFragment, arguments)
+        elif isinstance(event, StudentViewModel.PromptStudent):
             self.prompt_student()
-        if (isinstance(event, StudentViewModel.ConfirmDeleteStudent)):
+        elif isinstance(event, StudentViewModel.ConfirmDeleteStudent):
             self.confirm_delete_student(event.student)
+        elif isinstance(event, StudentViewModel.PromptProblemHeader):
+            self.prompt_problem_header(event.student)       
 
     def update_student_table(self, student_list):
         self.tw_student.setRowCount(len(student_list))
         for i, student in enumerate(student_list):
             student: Student
-            self.tw_student.setItem(i, 0, self.table_item_center(of_grade(student.grade)))
+            self.tw_student.setItem(i, 0, self.table_item_center(grade_name(student.grade)))
             self.tw_student.setItem(i, 1, self.table_item_center(student.name))
             self.tw_student.setItem(i, 2, self.table_item_center(student.school))
 
     def update_student_detail(self, student: Student):
         if student is not None:
-            text_detail = "◎  {:^6} | {:^6} | {:^12}".format(student.name, of_grade(student.grade), student.school)
+            text_detail = "◎  {:^6} | {:^6} | {:^12}".format(student.name, grade_name(student.grade), student.school)
             self.label_student.setText(text_detail)
         else:
             self.label_student.setText("")
@@ -119,6 +130,7 @@ class StudentFragment(Fragment):
         self.button_miss_manage = QPushButton('오답 관리')
         self.button_miss_manage.setFixedWidth(150)
         self.button_miss_manage.setObjectName('modify')
+        self.button_miss_manage.clicked.connect(self.view_model.on_miss_manage_click)
 
         self.right_header_layout.addWidget(self.button_miss_manage)
 
@@ -142,3 +154,9 @@ class StudentFragment(Fragment):
         result = msg_box.exec_()
         if result == QMessageBox.Ok:
             self.view_model.on_delete_student_confirm(student)
+
+    def prompt_problem_header(self, student: Student):
+        dialog = PromptProblemHeaderDialog(student.grade, None, None)
+        if dialog.exec_() == QDialog.Accepted:
+            problem_header = dialog.get_problem_header()
+            self.view_model.on_problem_header_result(problem_header)

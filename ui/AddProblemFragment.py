@@ -1,11 +1,9 @@
-import sys
-import shutil
-import os
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QFileDialog, QLabel, QStackedWidget,
-                              QPushButton, QRadioButton, QCheckBox, QButtonGroup, QComboBox)
+                              QPushButton, QRadioButton, QCheckBox, QButtonGroup, QComboBox, QMessageBox)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
+from ui.common.Navigation import *
 from ui.common.UiUtils import *
 from common.StringRes import *
 from ui.AddProblemViewModel import *
@@ -16,34 +14,69 @@ class AddProblemFragment(Fragment):
     view_model: AddProblemViewModel
     layout: QHBoxLayout
 
-    def __init__(self, title, view_model):
+    def __init__(self, title):
         super().__init__(title)
 
-        self.view_model = view_model
+        self.view_model = AddProblemViewModel()
         
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
-        self.layout_picture = self.create_picture_layout()
+        self.layout_picture = self.setup_picture_layout()
         self.layout.addLayout(self.layout_picture, stretch=3)
 
-        self.layout.addSpacing(16)
+        self.layout.addSpacing(32)
 
-        self.layout_form = self.create_form_layout()
+        self.layout_form = self.setup_form_layout()
         self.layout.addLayout(self.layout_form, stretch=2)
 
-        self.view_model.full_title.observe(self.update_title)
-        self.view_model.image_path_1.observe(lambda image_path: self.update_picture(image_path, self.label_picture_1))
-        self.view_model.image_path_2.observe(lambda image_path: self.update_picture(image_path, self.label_picture_2))
         self.view_model.problem_type.observe(self.update_problem_type)
         self.view_model.current_num_choices.observe(self.update_num_choice)
         self.view_model.answer_list_mcq.observe(self.update_choices)
+        self.view_model.image_data_main.observe(lambda data: self.update_image(data, True))
+        self.view_model.image_data_sub.observe(lambda data: self.update_image(data, False))
         self.view_model.is_input_valid.observe(self.button_submit.setEnabled)
 
         self.view_model.event.connect(self.on_event)
 
-    def update_title(self, title):
-        self.title = title if title is not None else ""
+    def on_resume(self):
+        problem_header = self.arguments['problem_header']
+        self.update_title(problem_header)
+        self.view_model.on_resume(problem_header)
+
+    def on_event(self, event):
+        if isinstance(event, AddProblemViewModel.NavigateBackWithResult):
+            Navigation._instance.navigate_back({'problem': event.problem})
+        elif isinstance(event, AddProblemViewModel.NavigateBack):
+            Navigation._instance.navigate_back()
+        elif isinstance(event, AddProblemViewModel.PromptImageFile):
+            self.select_image(event.is_main)
+        elif isinstance(event, AddProblemViewModel.ConfirmDeleteImage):
+            mb = QMessageBox(self)
+            mb.setWindowTitle('이미지 삭제')
+            mb.setText('이미지를 삭제하시겠습니까?')
+            mb.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            if mb.exec_() == QMessageBox.Ok:
+                self.view_model.on_delete_image_confirm(event.is_main)
+       
+    def on_choice_toggled(self, _button, _checked):
+        list_chekced = []
+        for i, check_button in enumerate(self.list_button_choice):
+            if check_button.isChecked():
+                list_chekced.append(i)
+        self.view_model.on_choice_change(list_chekced)
+
+    def select_image(self, is_main: bool):
+        path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Image Files (*.png *.jpg *.bmp)")
+        if path:
+            with open(path, 'rb') as file:
+                self.view_model.on_image_result(file.read(), is_main)
+
+    def update_title(self, header: ProblemHeader):
+        if header is not None:
+            self.title = problem_title(header)
+        else:
+            self.title = '-'
 
     def update_problem_type(self, type):
         self.bgroup_type.button(type).setChecked(True)
@@ -60,44 +93,60 @@ class AddProblemFragment(Fragment):
         for i, button_choice in enumerate(self.list_button_choice):
             button_choice.setChecked(i in answer_list)
 
-    def update_picture(self, image_path, label):
-        label.clear()
-        if image_path is not None:
-            pixmap = QPixmap(image_path)
-            if pixmap is not None:
-                scaled = pixmap.scaled(label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                label.setPixmap(scaled)
-      
-    def create_picture_layout(self):
+    def update_image(self, data: bytes, is_main: bool):
+        label = self.label_main_image if is_main else self.label_sub_image
+        button = self.button_delete_main_image if is_main else self.button_delete_sub_image
+        button.setEnabled(data is not None)
+        if data is not None:
+            pixmap = QPixmap()
+            pixmap.loadFromData(data)
+            scaled = pixmap.scaled(label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            label.setPixmap(scaled)
+        else:
+            label.clear()
+            
+    def setup_picture_layout(self):
         self.layout_picture = QHBoxLayout()
 
-        self.layout_picture_1 = QVBoxLayout()
-        self.layout_picture_2 = QVBoxLayout()
-        self.layout_picture.addLayout(self.layout_picture_1)
-        self.layout_picture.addLayout(self.layout_picture_2)
+        self.layout_main_image = QVBoxLayout()
+        self.layout_sub_image = QVBoxLayout()
+        self.layout_picture.addLayout(self.layout_main_image)
+        self.layout_picture.addLayout(self.layout_sub_image)
 
-        self.label_picture_1 = QLabel()
-        self.label_picture_1.setObjectName('picture')
+        self.label_main_image = QLabel()
+        self.label_main_image.setFixedSize(350, 480)
+        self.label_main_image.setObjectName('picture')
 
-        self.label_picture_2 = QLabel()
-        self.label_picture_2.setObjectName('picture')
+        self.label_sub_image = QLabel()
+        self.label_sub_image.setFixedSize(350, 480)
+        self.label_sub_image.setObjectName('picture')
 
-        self.button_upload_picture_1 = QPushButton('사진1 업로드')
-        self.button_upload_picture_1.setObjectName('modify')
-        self.button_upload_picture_1.clicked.connect(self.view_model.on_select_picture_1_click)
+        self.button_select_main_image = QPushButton('사진 업로드')
+        self.button_delete_main_image = QPushButton('사진 삭제')
+        self.button_select_main_image.setObjectName('modify')
+        self.button_delete_main_image.setObjectName('modify')
+        self.button_select_main_image.clicked.connect(lambda: self.view_model.on_select_image_click(True))
+        self.button_delete_main_image.clicked.connect(lambda: self.view_model.on_delete_image_click(True))
 
-        self.button_upload_picture_2 = QPushButton('사진2 업로드')
-        self.button_upload_picture_2.setObjectName('modify')
-        self.button_upload_picture_2.clicked.connect(self.view_model.on_select_picture_2_click)
+        self.button_select_sub_image = QPushButton('보기 사진 업로드')
+        self.button_delete_sub_image = QPushButton('보기 사진 삭제')
+        self.button_select_sub_image.setObjectName('modify')
+        self.button_delete_sub_image.setObjectName('modify')
+        self.button_select_sub_image.clicked.connect(lambda: self.view_model.on_select_image_click(False))
+        self.button_delete_sub_image.clicked.connect(lambda: self.view_model.on_delete_image_click(False))
 
-        self.layout_picture_1.addWidget(self.label_picture_1)
-        self.layout_picture_1.addWidget(self.button_upload_picture_1)
-        self.layout_picture_2.addWidget(self.label_picture_2)
-        self.layout_picture_2.addWidget(self.button_upload_picture_2)
+        self.layout_main_image.addWidget(self.label_main_image)
+        self.layout_main_image.addStretch(1)
+        self.layout_main_image.addWidget(self.button_select_main_image)
+        self.layout_main_image.addWidget(self.button_delete_main_image)
+        self.layout_sub_image.addWidget(self.label_sub_image)
+        self.layout_sub_image.addStretch(1)
+        self.layout_sub_image.addWidget(self.button_select_sub_image)
+        self.layout_sub_image.addWidget(self.button_delete_sub_image)
 
         return self.layout_picture
 
-    def create_form_layout(self):
+    def setup_form_layout(self):
         self.layout_form = QVBoxLayout()
 
         # radios for problem type
@@ -151,7 +200,7 @@ class AddProblemFragment(Fragment):
 
         self.combo_num_choice = QComboBox()
         self.combo_num_choice.setFixedWidth(200)
-        self.combo_num_choice.addItems([f'{i}' for i in self.view_model.range_num_choice])
+        self.combo_num_choice.addItems([f'{i} Choices' for i in self.view_model.range_num_choice])
         self.combo_num_choice.activated.connect(self.view_model.on_num_choice_change)
         self.layout_mcq.addWidget(self.combo_num_choice)
 
@@ -179,32 +228,4 @@ class AddProblemFragment(Fragment):
 
         return self.page_saq
 
-    def on_resume(self):
-        self.view_model.on_resume()
-
-    def on_event(self, event):
-        if isinstance(event, AddProblemViewModel.PromptImageFile):
-            self.select_image(event.sequence)
-        elif isinstance(event, AddProblemViewModel.MakeCopyImage):
-            self.make_copy_image(event.image_path, event.folder_name, event.file_name)
-
-    def on_choice_toggled(self, _button, _checked):
-        list_chekced = []
-        for i, check_button in enumerate(self.list_button_choice):
-            if check_button.isChecked():
-                list_chekced.append(i)
-        self.view_model.on_choice_change(list_chekced)
-
-    def set_problem_header(self, header: ProblemHeader):
-        self.view_model.on_problem_header_set(header)
-
-    def select_image(self, sequence):
-        image_path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "Image Files (*.png *.jpg *.bmp)")
-        if image_path:
-            self.view_model.on_image_result(sequence, image_path)
-
-    def make_copy_image(self, image_path, folder_name, file_name):
-        os.makedirs(folder_name, exist_ok=True)
-        base_name = os.path.basename(file_name)
-        destination_path = os.path.join(folder_name, base_name)
-        shutil.copy(image_path, destination_path)
+    

@@ -3,16 +3,35 @@ from PyQt5.QtGui import QPixmap, QPainter
 from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
 from ui.HomeViewModel import *
+from ui.AdminFragment import *
 
 class HomeFragment(Fragment):
 
     view_model: HomeViewModel
-    name_edit: QLineEdit
 
-    def __init__(self, title, view_model):
+    def __init__(self, title):
         super().__init__(title)
         
-        self.view_model = view_model
+        self.view_model = HomeViewModel()
+        
+        self.setup_ui()
+
+        self.view_model.event.connect(self.on_event)
+
+    def on_resume(self):
+        self.name_edit: QLineEdit
+        self.name_edit.setText("")
+        self.name_edit.setFocus()
+
+    def on_event(self, event):
+        if isinstance(event, HomeViewModel.NavigateToAdminScreen):
+            Navigation._instance.navigate(AdminFragment)
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.drawPixmap(0, 0, QPixmap("images/cosmos.jpg"))
+
+    def setup_ui(self):
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QVBoxLayout(self)
@@ -36,12 +55,3 @@ class HomeFragment(Fragment):
         self.name_edit.textChanged.connect(self.view_model.on_name_change)
         layout.addWidget(self.name_edit)
         layout.addStretch()
-
-    def on_resume(self):
-        self.name_edit: QLineEdit
-        self.name_edit.setText("")
-        self.name_edit.setFocus()
-        
-    def paintEvent(self, event):
-        p = QPainter(self)
-        p.drawPixmap(0, 0, QPixmap("images/cosmos.jpg"))

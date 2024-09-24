@@ -69,6 +69,21 @@ class DatabaseRepository:
             db.cursor.execute(sql)
             db.connection.commit()
 
+    def update(self, data: dict):
+        sql = f'UPDATE {self.table_name} SET '
+        for index, (key, value) in enumerate(data.items()):
+            if key == self.pk_name:
+                continue
+            sql += str(key)
+            sql += ' = '
+            sql += f"'{value}'" if isinstance(value, str) else str(value)
+            if index < len(data) - 1:
+                sql += ', '
+        sql += f" WHERE {self.pk_name} == '{data[self.pk_name]}'"
+        with DatabaseConnection(self.db_name) as db:
+            db.cursor.execute(sql)
+            db.connection.commit()
+
     def delete(self, id):
         with DatabaseConnection(self.db_name) as db:
             db.cursor.execute(f"DELETE FROM {self.table_name} WHERE {self.pk_name} == '{id}'")

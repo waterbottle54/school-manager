@@ -46,5 +46,8 @@ class ProblemRepository(DatabaseRepository):
     def insert(self, problem: Problem):
         super().insert(problem.to_record(), problem.id == -1)
 
+    def update(self, problem: Problem):
+         super().update(problem.to_record())
+
     def delete(self, id: int):
         super().delete(id)

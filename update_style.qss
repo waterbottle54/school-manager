@@ -59,3 +59,4 @@ QListWidget, QTableWidget {
     border: 2px solid #cbcbcb; /* Subtle border */
     border-radius: 4px; /* Rounded corners */
 }
+
