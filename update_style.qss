@@ -34,17 +34,13 @@ QPushButton#modify {
     padding: 12px;
 }
 
-QHeaderView::section {
+QHeaderView {
     background-color: #f0f0f0;   /* Light gray background */
     color: #333333;              /* Darker gray text for contrast */
     font-size: 12pt;             /* Slightly larger font for readability */
     padding: 4px;                /* Minimal padding for a clean look */
     border: none;                /* No borders for a flat modern look */
     border-bottom: 1px solid #cccccc; /* Subtle bottom border */
-}
-
-QTableWidget {
-    gridline-color: #e0e0e0;     /* Light gray grid lines for a soft look */
 }
 
 QLabel#picture {

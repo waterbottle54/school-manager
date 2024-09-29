@@ -2,9 +2,10 @@ from PyQt5.QtWidgets import (QPushButton, QTableWidget, QVBoxLayout, QHBoxLayout
                              QTableWidgetItem, QAbstractItemView, QListWidget)
 from PyQt5.QtCore import Qt
 from ui.common.Fragment import *
-from ui.AddProblemFragment import *
 from ui.StudentViewModel import *
+from ui.MissFragment import *
 from ui.common.UiUtils import *
+from ui.common.Navigation import *
 from ui.dialogs.AddStudentDialog import *
 from ui.dialogs.PromptProblemHeaderDialog import *
 from common.StringRes import *
@@ -44,20 +45,13 @@ class StudentFragment(Fragment):
     def on_resume(self):
         self.view_model.on_resume()
 
-        results = Navigation._instance.get_fragment_results(self)
-        if results is not None and 'problem' in results:
-            self.view_model.on_add_problem_result(results['problem'])
-
     def on_event(self, event: StudentViewModel.Event):
-        if isinstance(event, StudentViewModel.NavigateToAddProblemScreen):
-            arguments = {'problem_header': event.problem_header}
-            Navigation._instance.navigate(AddProblemFragment, arguments)
+        if isinstance(event, StudentViewModel.NavigateToMissScreen):
+            Navigation._instance.navigate(MissFragment, {'student': event.student})
         elif isinstance(event, StudentViewModel.PromptStudent):
             self.prompt_student()
         elif isinstance(event, StudentViewModel.ConfirmDeleteStudent):
-            self.confirm_delete_student(event.student)
-        elif isinstance(event, StudentViewModel.PromptProblemHeader):
-            self.prompt_problem_header(event.student)       
+            self.confirm_delete_student(event.student)      
 
     def update_student_table(self, student_list):
         self.tw_student.setRowCount(len(student_list))

@@ -77,7 +77,7 @@ class ProblemViewModel(QObject):
         self.image_repository = ImageRepository()
 
         self.book_list = self.book_repository.get_list()
-        self.current_book_index = MutableLiveData(1)
+        self.current_book_index = MutableLiveData(0)
         self.current_book = map(self.current_book_index, lambda i: self.book_list[i] if i != -1 else None)
 
         self.grade_list = [ i for i in range(6, 12)]

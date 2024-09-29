@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QSizePolicy
+from PyQt5.QtWidgets import QFrame, QSizePolicy
 
-class Fragment(QWidget):
+class Fragment(QFrame):
     
     title: str = ""
     arguments: dict = None
@@ -12,8 +12,14 @@ class Fragment(QWidget):
         self.setContentsMargins(16, 16, 16, 16)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-    def set_arguments(self, arguments: dict):
+    def on_start(self, arguments: dict = None):
         self.arguments = arguments
+
+    def on_pause(self):
+        pass
+
+    def on_restart(self, result: dict = None):
+        pass
 
     def on_resume(self):
         pass

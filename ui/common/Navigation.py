@@ -1,11 +1,11 @@
-from PyQt5.QtWidgets import QLayout
+from PyQt5.QtWidgets import QLayout, QVBoxLayout
 from ui.common.Fragment import *
 from ui.common.Toolbar import *
 
 class Navigation:
 
-    layout: QLayout
-
+    container: QWidget
+    
     graph: dict
     home_fragment: Fragment
     current_fragment: Fragment
@@ -13,7 +13,8 @@ class Navigation:
     back_stack: list[Fragment]
     back_stack_changed = None
 
-    fragment_results: tuple
+    fragment_result_interceptor: Fragment
+    data_result: dict
 
     toolbar: Toolbar = None
 
@@ -22,15 +23,18 @@ class Navigation:
             cls._instance = super().__new__(cls) 
         return cls._instance                    
 
-    def __init__(self, layout: QLayout, graph: dict, home):
+    def __init__(self, container: QWidget, graph: dict, home):
         cls = type(self)
         if not hasattr(cls, "_init"):             
-            self.layout = layout
+            self.container = container
+            self.layout = QVBoxLayout()
+            self.container.setLayout(self.layout)
             self.graph = graph
             self.home_fragment = graph[home]
             self.current_fragment = None
             self.back_stack = []
-            self.results_stack = {}
+            self.data_result = {}
+            self.fragment_result_interceptor = None
             cls._init = True
 
     def set_back_stack_changed_listener(self, listener):
@@ -44,34 +48,28 @@ class Navigation:
         if cls not in self.graph:
             return
         
-        dest = self.graph[cls]
         if self.current_fragment is not None:
             self.back_stack.append(self.current_fragment)
             self.layout.removeWidget(self.current_fragment)
             self.current_fragment.setParent(None)
 
-        self.current_fragment = dest
+        self.current_fragment = self.graph[cls]
         self.layout.addWidget(self.current_fragment)
 
-        self.current_fragment.set_arguments(arguments)
+        self.current_fragment.on_start(arguments)
         self.on_fragment_change()
 
-    def navigate_back(self, fragment_results: dict = None):
+    def navigate_back(self, data_result: dict = None):
         if len(self.back_stack) > 0:
+            self.current_fragment.on_pause()
+
             self.layout.removeWidget(self.current_fragment)
             self.current_fragment.setParent(None)
             
-            fragment = self.back_stack.pop()
-            self.current_fragment = fragment
-
+            self.current_fragment = self.back_stack.pop()
             self.layout.addWidget(self.current_fragment)
 
-            if fragment_results is None:
-                self.fragment_results = None
-            else:
-                self.fragment_results = (self.current_fragment, fragment_results)
-
-            self.current_fragment.set_arguments(None)
+            self.current_fragment.restart(data_result)
             self.on_fragment_change()
 
     def on_fragment_change(self):
@@ -102,11 +100,3 @@ class Navigation:
 
         button_back.setVisible(len(self.back_stack) > 0)
         label_title.setText(self.current_fragment.title)
-
-    def get_fragment_results(self, fragment: Fragment) -> dict:
-        if self.fragment_results is None:
-            return None
-        if self.fragment_results[0] == fragment:
-            results = self.fragment_results[1]
-            self.fragment_results = None
-            return results

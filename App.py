@@ -1,16 +1,14 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QVBoxLayout
-from PyQt5.QtGui import QKeyEvent, QPainter, QPixmap, QFontDatabase, QFont
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout
+from PyQt5.QtGui import QKeyEvent, QFontDatabase, QFont
 from PyQt5.QtCore import Qt
 from ui.HomeFragment import *
 from ui.AdminFragment import *
 from ui.DataFragment import *
 from ui.StudentFragment import *
-from ui.StudentViewModel import *
 from ui.ProblemFragment import *
-from ui.ProblemViewModel import *
 from ui.AddProblemFragment import *
-from ui.AddProblemViewModel import *
+from ui.MissFragment import *
 from ui.common.Navigation import *
 from ui.common.Toolbar import *
 
@@ -18,6 +16,7 @@ class MainWindow(QMainWindow):
 
     navigation: Navigation
     layout: QVBoxLayout
+    container: QWidget
     toolbar: Toolbar
 
     def __init__(self):
@@ -31,21 +30,28 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(0,0,0,0)
         central_widget.setLayout(self.layout)
         
         self.toolbar = Toolbar()
         self.layout.addWidget(self.toolbar)
 
+        self.container = QWidget()
+        self.layout.addWidget(self.container)
+        
         self.graph = {
             HomeFragment: HomeFragment('홈'),
             AdminFragment: AdminFragment('관리자'),
             DataFragment: DataFragment('데이터 관리'),
             StudentFragment: StudentFragment('학생'),
             ProblemFragment: ProblemFragment('문제'),
-            AddProblemFragment: AddProblemFragment('문제 추가') 
+            AddProblemFragment: AddProblemFragment('문제 추가'),
+            MissFragment: MissFragment('오답 관리')
         } 
-        self.navigation = Navigation(self.layout, self.graph, HomeFragment)
+        self.navigation = Navigation(self.container, self.graph, HomeFragment)
         self.navigation.setup_with_toolbar(self.toolbar)
+        self.navigation.set_back_stack_changed_listener(
+            lambda fragment: self.toolbar.setVisible(not isinstance(fragment, HomeFragment)))
 
         self.navigation.navigate(HomeFragment)
 

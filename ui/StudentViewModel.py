@@ -20,15 +20,10 @@ class StudentViewModel(QObject):
         def __init__(self, student: Student):
             self.student = student
 
-    class PromptProblemHeader(Event):
+    class NavigateToMissScreen(Event):
         student: Student
-        def __init__(self, student: Student):
+        def __init__(self, student):
             self.student = student
-
-    class NavigateToAddProblemScreen(Event):
-        problem_header: ProblemHeader
-        def __init__(self, problem_header: ProblemHeader):
-            self.problem_header = problem_header
 
     event: pyqtSignal = pyqtSignal(Event)
 
@@ -87,14 +82,4 @@ class StudentViewModel(QObject):
     def on_miss_manage_click(self):
         student = self.current_student.value
         if student is not None:
-            self.event.emit(StudentViewModel.PromptProblemHeader(student))
-
-    def on_problem_header_result(self, problem_header: ProblemHeader):
-        if problem_header is None:
-            return
-        problem_queried = self.problem_repository.query_by_header(problem_header)
-        problem = problem_queried[0] if len(problem_queried) > 0 else None
-        if problem is None:
-            self.event.emit(StudentViewModel.NavigateToAddProblemScreen(problem_header))
-        if problem is not None:
-            pass
+            self.event.emit(StudentViewModel.NavigateToMissScreen(student))
