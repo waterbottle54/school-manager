@@ -1,11 +1,13 @@
 from PyQt5.QtWidgets import QLayout, QVBoxLayout
+
 from ui.common.Fragment import *
 from ui.common.Toolbar import *
+
 
 class Navigation:
 
     container: QWidget
-    
+
     graph: dict
     home_fragment: Fragment
     current_fragment: Fragment
@@ -19,13 +21,13 @@ class Navigation:
     toolbar: Toolbar = None
 
     def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, "_instance"):         
-            cls._instance = super().__new__(cls) 
-        return cls._instance                    
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(self, container: QWidget, graph: dict, home):
         cls = type(self)
-        if not hasattr(cls, "_init"):             
+        if not hasattr(cls, "_init"):
             self.container = container
             self.layout = QVBoxLayout()
             self.container.setLayout(self.layout)
@@ -47,7 +49,7 @@ class Navigation:
     def navigate(self, cls, arguments: dict = None):
         if cls not in self.graph:
             return
-        
+
         if self.current_fragment is not None:
             self.back_stack.append(self.current_fragment)
             self.layout.removeWidget(self.current_fragment)
@@ -65,11 +67,11 @@ class Navigation:
 
             self.layout.removeWidget(self.current_fragment)
             self.current_fragment.setParent(None)
-            
+
             self.current_fragment = self.back_stack.pop()
             self.layout.addWidget(self.current_fragment)
 
-            self.current_fragment.restart(data_result)
+            self.current_fragment.on_restart(data_result)
             self.on_fragment_change()
 
     def on_fragment_change(self):
@@ -84,11 +86,11 @@ class Navigation:
 
         if self.update_toolbar is None:
             return
-        
+
         layout = self.toolbar.layout
         label_title = self.toolbar.label_title
         button_back = self.toolbar.button_back
-        
+
         if self.current_fragment != self.home_fragment:
             label_title.setVisible(True)
             button_back.setVisible(True)

@@ -1,9 +1,11 @@
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QSizePolicy, QGraphicsDropShadowEffect
-from PyQt5.QtGui import QPixmap, QPainter
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPainter, QPixmap
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QLabel, QLineEdit, QVBoxLayout
+
+from ui.AdminFragment import *
 from ui.common.Fragment import *
 from ui.HomeViewModel import *
-from ui.AdminFragment import *
+
 
 class HomeFragment(Fragment):
 
@@ -11,9 +13,9 @@ class HomeFragment(Fragment):
 
     def __init__(self, title):
         super().__init__(title)
-        
+
         self.view_model = HomeViewModel()
-        
+
         self.setup_ui()
 
         self.view_model.event.connect(self.on_event)
@@ -35,11 +37,11 @@ class HomeFragment(Fragment):
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        layout.setAlignment(Qt.AlignHCenter)
         self.setLayout(layout)
 
-        label = QLabel('이름을 입력해주세요')
-        label.setStyleSheet('color: white; font-size: 24px;')
+        label = QLabel("이름을 입력해주세요")
+        label.setStyleSheet("color: white; font-size: 24px;")
         shadow = QGraphicsDropShadowEffect(label)
         shadow.setColor(Qt.GlobalColor.black)
         shadow.setOffset(2, 2)

@@ -1,26 +1,37 @@
-from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QMessageBox, QAbstractItemView, 
-                             QStackedWidget, QButtonGroup, QCheckBox)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from ui.common.Fragment import *
-from ui.AddProblemFragment import *
-from ui.common.UiUtils import *
+from PyQt5.QtWidgets import (
+    QAbstractItemView,
+    QButtonGroup,
+    QComboBox,
+    QHBoxLayout,
+    QMessageBox,
+    QPushButton,
+    QStackedWidget,
+    QTableWidget,
+    QVBoxLayout,
+)
+
 from common.StringRes import *
-from ui.ProblemViewModel import *
-from ui.dialogs.PromptProblemHeaderDialog import *
+from ui.AddProblemFragment import *
+from ui.common.Fragment import *
 from ui.common.NonClickableCheckBox import *
+from ui.common.UiUtils import *
+from ui.dialogs.PromptProblemHeaderDialog import *
+from ui.ProblemViewModel import *
+
 
 class ProblemFragment(Fragment):
 
     view_model: ProblemViewModel
 
     layout: QHBoxLayout
-   
+
     def __init__(self, title):
         super().__init__(title)
 
         self.view_model = ProblemViewModel()
-        
+
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
@@ -34,12 +45,20 @@ class ProblemFragment(Fragment):
 
         self.view_model.current_book_index.observe(self.combo_book.setCurrentIndex)
         self.view_model.current_grade_index.observe(self.combo_grade.setCurrentIndex)
-        self.view_model.current_chapter_index.observe(self.combo_chapter.setCurrentIndex)
-        self.view_model.current_problem_index.observe(lambda i: self.tw_problem.selectRow(i))
+        self.view_model.current_chapter_index.observe(
+            self.combo_chapter.setCurrentIndex
+        )
+        self.view_model.current_problem_index.observe(
+            lambda i: self.tw_problem.selectRow(i)
+        )
         self.view_model.chapter_list.observe(self.update_chapter_combo)
         self.view_model.problem_list.observe(self.update_problem_table)
-        self.view_model.can_delete_problem.observe(self.button_delete_problem.setEnabled)
-        self.view_model.can_modify_problem.observe(self.button_modify_problem.setEnabled)
+        self.view_model.can_delete_problem.observe(
+            self.button_delete_problem.setEnabled
+        )
+        self.view_model.can_modify_problem.observe(
+            self.button_modify_problem.setEnabled
+        )
         self.view_model.current_problem.observe(self.update_problem_detail)
         self.view_model.image_main.observe(self.update_image_main)
         self.view_model.image_sub.observe(self.update_image_sub)
@@ -51,7 +70,7 @@ class ProblemFragment(Fragment):
 
     def on_event(self, event: ProblemViewModel.Event):
         if isinstance(event, ProblemViewModel.NavigateToAddProblem):
-            arguments = {'problem_header': event.problem_header}
+            arguments = {"problem_header": event.problem_header}
             Navigation._instance.navigate(AddProblemFragment, arguments)
         elif isinstance(event, ProblemViewModel.PromptProblemHeader):
             dialog = PromptProblemHeaderDialog(event.grade, event.chapter, event.book)
@@ -60,13 +79,13 @@ class ProblemFragment(Fragment):
                 self.view_model.on_problem_header_result(problem_header)
         elif isinstance(event, ProblemViewModel.ShowGeneralMessage):
             mb = QMessageBox(self)
-            mb.setWindowTitle('메시지')
+            mb.setWindowTitle("메시지")
             mb.setText(event.message)
             mb.show()
         elif isinstance(event, ProblemViewModel.ConfirmDeleteProblem):
             mb = QMessageBox(self)
-            mb.setWindowTitle('문제 삭제')
-            mb.setText(f'{event.problem.title} 문제를 삭제하시겠습니까?')
+            mb.setWindowTitle("문제 삭제")
+            mb.setText(f"{event.problem.title} 문제를 삭제하시겠습니까?")
             mb.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
             mb.setDefaultButton(QMessageBox.Cancel)
             if mb.exec_() == QMessageBox.Ok:
@@ -88,7 +107,9 @@ class ProblemFragment(Fragment):
         if data is not None:
             pixmap = QPixmap()
             pixmap.loadFromData(data)
-            scaled = pixmap.scaled(label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            scaled = pixmap.scaled(
+                label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
             label.setPixmap(scaled)
         else:
             self.label_image_main.clear()
@@ -98,7 +119,9 @@ class ProblemFragment(Fragment):
         if data is not None:
             pixmap = QPixmap()
             pixmap.loadFromData(data)
-            scaled = pixmap.scaled(label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            scaled = pixmap.scaled(
+                label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
             label.setPixmap(scaled)
         else:
             self.label_image_sub.clear()
@@ -114,15 +137,10 @@ class ProblemFragment(Fragment):
         self.tw_problem.setRowCount(len(problem_list))
         for i, problem in enumerate(problem_list):
             problem: Problem
-            self.tw_problem.setItem(i, 0, self.table_item_center(grade_name(problem.grade)))
-            self.tw_problem.setItem(i, 1, self.table_item_center(problem.chapter))
-            self.tw_problem.setItem(i, 2, self.table_item_center(problem.book))
-            self.tw_problem.setItem(i, 3, self.table_item_center(problem.title))
-    
-    def table_item_center(self, text: str) -> QTableWidgetItem:
-        item = QTableWidgetItem(text)
-        item.setTextAlignment(Qt.AlignCenter)
-        return item    
+            self.tw_problem.setItem(i, 0, table_item_center(grade_name(problem.grade)))
+            self.tw_problem.setItem(i, 1, table_item_center(problem.chapter))
+            self.tw_problem.setItem(i, 2, table_item_center(problem.book))
+            self.tw_problem.setItem(i, 3, table_item_center(problem.title))
 
     def setup_problem_list_layout(self):
 
@@ -146,26 +164,32 @@ class ProblemFragment(Fragment):
         self.combo_grade = QComboBox()
         self.layout_combos.addWidget(self.combo_grade)
 
-        items_grade = [ grade_name(i) for i in self.view_model.grade_list ]
+        items_grade = [grade_name(i) for i in self.view_model.grade_list]
         self.combo_grade.addItems(items_grade)
         self.combo_grade.currentIndexChanged.connect(self.view_model.on_grade_change)
-        
+
         self.combo_chapter = QComboBox()
         self.layout_combos.addWidget(self.combo_chapter)
-        self.combo_chapter.currentIndexChanged.connect(self.view_model.on_chapter_change)
+        self.combo_chapter.currentIndexChanged.connect(
+            self.view_model.on_chapter_change
+        )
 
         # buttons
-        self.button_add_problem = QPushButton('문제 등록')
-        self.button_add_problem.setObjectName('modify')
+        self.button_add_problem = QPushButton("문제 등록")
+        self.button_add_problem.setObjectName("modify")
         self.button_add_problem.clicked.connect(self.view_model.on_add_problem_click)
 
-        self.button_modify_problem = QPushButton('수정')
-        self.button_modify_problem.setObjectName('modify')
-        self.button_modify_problem.clicked.connect(self.view_model.on_modify_problem_click)
+        self.button_modify_problem = QPushButton("수정")
+        self.button_modify_problem.setObjectName("modify")
+        self.button_modify_problem.clicked.connect(
+            self.view_model.on_modify_problem_click
+        )
 
-        self.button_delete_problem = QPushButton('삭제')
-        self.button_delete_problem.setObjectName('modify')
-        self.button_delete_problem.clicked.connect(self.view_model.on_delete_problem_click)
+        self.button_delete_problem = QPushButton("삭제")
+        self.button_delete_problem.setObjectName("modify")
+        self.button_delete_problem.clicked.connect(
+            self.view_model.on_delete_problem_click
+        )
 
         self.layout_buttons.addWidget(self.button_add_problem)
         self.layout_buttons.addWidget(self.button_modify_problem)
@@ -174,7 +198,7 @@ class ProblemFragment(Fragment):
         return layout
 
     def setup_problem_detail_layout(self):
-        
+
         layout = QVBoxLayout()
 
         # images & contents
@@ -187,7 +211,7 @@ class ProblemFragment(Fragment):
 
         # images
         self.label_image_main = QLabel()
-        self.label_image_main.setObjectName('picture')
+        self.label_image_main.setObjectName("picture")
         self.label_image_main.setFixedSize(330, 420)
         self.label_image_main.setAlignment(Qt.AlignCenter)
         self.layout_problem_images.addWidget(self.label_image_main)
@@ -195,7 +219,7 @@ class ProblemFragment(Fragment):
         self.layout_problem_images.addSpacing(8)
 
         self.label_image_sub = QLabel()
-        self.label_image_sub.setObjectName('picture')
+        self.label_image_sub.setObjectName("picture")
         self.label_image_sub.setFixedSize(330, 420)
         self.label_image_sub.setAlignment(Qt.AlignCenter)
         self.layout_problem_images.addWidget(self.label_image_sub)
@@ -213,14 +237,16 @@ class ProblemFragment(Fragment):
         self.stacked_widget.addWidget(self.empty_page)
 
         return layout
-    
+
     def create_mcq_page(self):
         self.layout_choices = QHBoxLayout()
-       
+
         self.bgroup_choice = QButtonGroup()
         self.bgroup_choice.setExclusive(False)
         max_num_choice = self.view_model.range_num_choice.stop
-        self.list_button_choice = [ NonClickableCheckBox(f'{i+1}') for i in range(max_num_choice) ]
+        self.list_button_choice = [
+            NonClickableCheckBox(f"{i+1}") for i in range(max_num_choice)
+        ]
         for i, button_choice in enumerate(self.list_button_choice):
             self.layout_choices.addWidget(button_choice)
             self.bgroup_choice.addButton(button_choice, i)
@@ -249,6 +275,6 @@ class ProblemFragment(Fragment):
         tw.setSelectionBehavior(QTableWidget.SelectRows)
         tw.verticalHeader().setVisible(False)
         tw.setHorizontalHeaderLabels(["학년", "단원", "교재", "문제"])
-        
+
         tw.cellClicked.connect(self.view_model.on_problem_click)
         return tw

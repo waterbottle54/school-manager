@@ -1,5 +1,6 @@
 from data.Problem import *
 
+
 class ProblemHeader:
     grade: int
     chapter: str
@@ -11,12 +12,17 @@ class ProblemHeader:
         self.chapter = chapter
         self.book = book
         self.title = title
-    
+
     def matches(self, problem: Problem) -> bool:
         if problem is None:
             return False
-        return self.grade == problem.grade and self.chapter == problem.chapter and self.book == problem.book and self.title == problem.title
-    
-def from_problem(problem: Problem) -> ProblemHeader:
-    return ProblemHeader(problem.grade, problem.chapter, problem.book, problem.title)
+        return (
+            self.grade == problem.grade
+            and self.chapter == problem.chapter
+            and self.book == problem.book
+            and self.title == problem.title
+        )
 
+
+def header_from_problem(problem: Problem) -> ProblemHeader:
+    return ProblemHeader(problem.grade, problem.chapter, problem.book, problem.title)

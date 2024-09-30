@@ -34,12 +34,12 @@ QPushButton#modify {
     padding: 12px;
 }
 
-QHeaderView {
+QHeaderView::section {
     background-color: #f0f0f0;   /* Light gray background */
     color: #333333;              /* Darker gray text for contrast */
     font-size: 12pt;             /* Slightly larger font for readability */
-    padding: 4px;                /* Minimal padding for a clean look */
-    border: none;                /* No borders for a flat modern look */
+    padding: 4px;
+    border: none;
     border-bottom: 1px solid #cccccc; /* Subtle bottom border */
 }
 
@@ -55,4 +55,3 @@ QListWidget, QTableWidget {
     border: 2px solid #cbcbcb; /* Subtle border */
     border-radius: 4px; /* Rounded corners */
 }
-

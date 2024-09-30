@@ -1,13 +1,16 @@
-from PyQt5.QtCore import QObject, pyqtSignal
 import base64
+
+from PyQt5.QtCore import QObject, pyqtSignal
+
 from common.LiveData import *
-from data.common.ListRepository import *
-from data.common.ListDictRepository import *
-from data.Problem import *
 from data.BookRepository import *
-from data.ProblemRepository import *
 from data.ChapterRepository import *
+from data.common.ListDictRepository import *
+from data.common.ListRepository import *
 from data.ImageRepository import *
+from data.Problem import *
+from data.ProblemRepository import *
+
 
 class AddProblemViewModel(QObject):
 
@@ -16,16 +19,19 @@ class AddProblemViewModel(QObject):
 
     class PromptImageFile(Event):
         is_main: bool
+
         def __init__(self, is_main: bool):
             self.is_main = is_main
 
     class ConfirmDeleteImage(Event):
         is_main: bool
+
         def __init__(self, is_main: bool):
             self.is_main = is_main
 
     class NavigateBackWithResult(Event):
         problem: Problem
+
         def __init__(self, problem: Problem):
             self.problem = problem
 
@@ -52,7 +58,6 @@ class AddProblemViewModel(QObject):
 
     is_input_valid: LiveData
 
-
     def __init__(self):
         super().__init__()
         self.problem_repository = ProblemRepository()
@@ -68,13 +73,19 @@ class AddProblemViewModel(QObject):
         self.image_data_main = MutableLiveData(None)
         self.image_data_sub = MutableLiveData(None)
 
-        self.is_input_valid = map4(self.problem_type, self.answer_list_mcq, self.answer_dict_saq, self.image_data_main,
-                                   lambda type, mcq, saq, img: (img is not None) and (len(mcq) > 0 if type == 0 else len(saq) > 0))
-    
-    def on_resume(self, problem_header: ProblemHeader):
+        self.is_input_valid = map4(
+            self.problem_type,
+            self.answer_list_mcq,
+            self.answer_dict_saq,
+            self.image_data_main,
+            lambda type, mcq, saq, img: (img is not None)
+            and (len(mcq) > 0 if type == 0 else len(saq) > 0),
+        )
 
-        self.problem_header = problem_header
-        problem = self.problem_repository.query_by_header(problem_header)
+    def on_start(self, arguments: dict):
+
+        self.problem_header = arguments["problem_header"]
+        problem = self.problem_repository.query_by_header(self.problem_header)
         self.problem_existing = problem[0] if len(problem) > 0 else None
 
         if self.problem_existing is None:
@@ -89,14 +100,18 @@ class AddProblemViewModel(QObject):
             self.answer_list_mcq.set_value(problem.ans_mcq)
             self.answer_dict_saq.set_value(problem.ans_saq)
             self.problem_type.set_value(0 if len(problem.ans_mcq) > 0 else 1)
-            image_main = self.image_repository.load_problem_image(self.problem_header, True)
-            image_sub = self.image_repository.load_problem_image(self.problem_header, False)
+            image_main = self.image_repository.load_problem_image(
+                self.problem_header, True
+            )
+            image_sub = self.image_repository.load_problem_image(
+                self.problem_header, False
+            )
             self.image_data_main.set_value(image_main)
             self.image_data_sub.set_value(image_sub)
-            
+
     def on_select_image_click(self, is_main: bool):
         self.event.emit(AddProblemViewModel.PromptImageFile(is_main))
-        
+
     def on_image_result(self, data: bytes, is_main: bool):
         image = self.image_data_main if is_main else self.image_data_sub
         image.set_value(data)
@@ -109,7 +124,9 @@ class AddProblemViewModel(QObject):
     def on_delete_image_confirm(self, is_main: bool):
         data = self.image_data_main if is_main else self.image_data_sub
         if data.value is not None:
-            result = self.image_repository.delete_problem_image(self.problem_header, is_main)
+            result = self.image_repository.delete_problem_image(
+                self.problem_header, is_main
+            )
             if result == True:
                 data.set_value(None)
 
@@ -131,13 +148,18 @@ class AddProblemViewModel(QObject):
             return
 
         header = self.problem_header
-        grade, chapter, book, title = header.grade, header.chapter, header.book, header.title
+        grade, chapter, book, title = (
+            header.grade,
+            header.chapter,
+            header.book,
+            header.title,
+        )
         image_main, image_sub = self.image_data_main.value, self.image_data_sub.value
 
         num_choices = self.current_num_choices.value
         ans_mcq = self.answer_list_mcq.value
         ans_saq = self.answer_dict_saq.value
-        problem = Problem(grade, chapter, book, title, num_choices, ans_mcq, ans_saq) 
+        problem = Problem(grade, chapter, book, title, num_choices, ans_mcq, ans_saq)
 
         if self.problem_existing is None:
             self.problem_repository.insert(problem)
