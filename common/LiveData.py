@@ -1,26 +1,31 @@
 
+from typing import Generic, TypeVar
+
+
 class LiveData:
 
     value = None
-    observers = None
+    observers: list | None = None
 
     def __init__(self, value):
         self.value = value
         self.observers = []
     
     def _set_value(self, value):
-        self.value = value
-        for observer in self.observers:
-            observer(self.value)
+        if self.observers is not None:
+            self.value = value
+            for observer in self.observers:
+                observer(self.value)
 
     def _publish(self):
-        self.set_value(self.value)
+        self._set_value(self.value)
 
     def observe(self, observer):
-        observer(self.value)
-        self.observers.append(observer)
-        if self.value is not None:
+        if (self.observers is not None) and (observer is not None):
             observer(self.value)
+            self.observers.append(observer)
+            if self.value is not None:
+                observer(self.value)
 
 class MutableLiveData(LiveData):
     def __init__(self, value):

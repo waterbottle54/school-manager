@@ -1,9 +1,10 @@
 from abc import abstractmethod
 
 from data.common.DatabaseConnection import *
+from abc import ABC
 
 
-class DatabaseRepository:
+class DatabaseRepository(ABC):
 
     db_name: str
     table_name: str
@@ -23,7 +24,8 @@ class DatabaseRepository:
             if original_version != version:
                 self.set_db_version(db, self.version)
                 db.cursor.execute(f"DROP TABLE IF EXISTS {self.table_name}")
-                db.connection.commit()
+                if db.connection is not None:
+                    db.connection.commit()
 
             # table creation
             db.cursor.execute(
@@ -45,7 +47,8 @@ class DatabaseRepository:
             "INSERT OR REPLACE INTO version_info (rowid, version) VALUES (1, ?)",
             (version,),
         )
-        db.connection.commit()
+        if db.connection is not None:
+            db.connection.commit()
 
     @abstractmethod
     def on_create_table(self, db: DatabaseConnection):
@@ -59,7 +62,8 @@ class DatabaseRepository:
         list = []
         with DatabaseConnection(self.db_name) as db:
             db.cursor.execute(sql, args)
-            db.connection.commit()
+            if db.connection is not None:
+                db.connection.commit()
             rows = db.cursor.fetchall()
             for row in rows:
                 objects = self.to_object(row)
@@ -77,7 +81,8 @@ class DatabaseRepository:
             db.cursor.execute(
                 f"INSERT INTO {self.table_name} ({columns}) VALUES ({values})"
             )
-            db.connection.commit()
+            if db.connection is not None:
+                db.connection.commit()
 
     def update(self, data: dict):
         id = data.pop(self.pk_name)
@@ -86,18 +91,20 @@ class DatabaseRepository:
             db.cursor.execute(
                 f"UPDATE {self.table_name} SET {columns} WHERE {self.pk_name} = ?",
                 (
-                    data.values(),
+                    *data.values(),
                     id,
                 ),
             )
-            db.connection.commit()
+            if db.connection is not None:
+                db.connection.commit()
 
     def delete(self, id):
         with DatabaseConnection(self.db_name) as db:
             db.cursor.execute(
-                f"DELETE FROM {self.table_name} WHERE ? == ?", (self.pk_name, id)
+                f"DELETE FROM {self.table_name} WHERE {self.pk_name} = ?", (id,)
             )
-            db.connection.commit()
+            if db.connection is not None:
+                db.connection.commit()
 
     def format_value(self, value):
         if isinstance(value, str):

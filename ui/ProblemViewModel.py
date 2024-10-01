@@ -137,7 +137,7 @@ class ProblemViewModel(QObject):
             self.current_problem,
             lambda problem: (
                 self.image_repository.load_problem_image(
-                    header_from_problem(problem), True
+                    ProblemHeader.from_problem(problem), True
                 )
                 if problem is not None
                 else None
@@ -148,7 +148,7 @@ class ProblemViewModel(QObject):
             self.current_problem,
             lambda problem: (
                 self.image_repository.load_problem_image(
-                    header_from_problem(problem), False
+                    ProblemHeader.from_problem(problem), False
                 )
                 if problem is not None
                 else None
@@ -179,7 +179,8 @@ class ProblemViewModel(QObject):
         grade = self.current_grade.value
         chapter = self.current_chapter.value
         book = self.current_book.value
-        self.event.emit(ProblemViewModel.PromptProblemHeader(grade, chapter, book))
+        if (grade is not None) and (chapter is not None) and (book is not None):
+            self.event.emit(ProblemViewModel.PromptProblemHeader(grade, chapter, book))
 
     def on_problem_header_result(self, problem_header: ProblemHeader):
         if problem_header is None:
@@ -193,11 +194,10 @@ class ProblemViewModel(QObject):
             )
 
     def on_delete_problem_click(self):
-        if self.can_delete_problem.value is False:
-            return
-        self.event.emit(
-            ProblemViewModel.ConfirmDeleteProblem(self.current_problem.value)
-        )
+        if self.current_problem.value is not None:
+            self.event.emit(
+                ProblemViewModel.ConfirmDeleteProblem(self.current_problem.value)
+            )
 
     def on_delete_probem_confirmed(self, problem: Problem):
         self.problem_repository.delete(problem.id)
@@ -206,5 +206,5 @@ class ProblemViewModel(QObject):
     def on_modify_problem_click(self):
         problem = self.current_problem.value
         if problem is not None:
-            header = header_from_problem(problem)
+            header = ProblemHeader.from_problem(problem)
             self.event.emit(ProblemViewModel.NavigateToAddProblem(header))

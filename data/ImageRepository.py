@@ -17,7 +17,7 @@ class ImageRepository:
         with open(path, "wb") as file:
             file.write(data)
 
-    def load_problem_image(self, header: ProblemHeader, is_main: bool) -> bytes:
+    def load_problem_image(self, header: ProblemHeader, is_main: bool) -> bytes | None:
         path = self.get_problem_image_path(header, is_main)
         try:
             with open(path, "rb") as file:

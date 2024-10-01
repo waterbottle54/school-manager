@@ -43,11 +43,28 @@ class Problem:
             'created': self.created
         }
     
-    def from_record(id: int, grade: int, chapter: str, book: str, title: str, num_choice: int, 
-                    json_ans_mcq: str, json_ans_saq: str, created: int):
+    @staticmethod
+    def from_record(
+        id: int, 
+        grade: int, 
+        chapter: str, 
+        book: str, 
+        title: str, 
+        num_choice: int, 
+        json_ans_mcq: str, 
+        json_ans_saq: str, 
+        created: int
+        ):
+        
         ans_mcq = json.loads(json_ans_mcq)
         ans_saq = json.loads(json_ans_saq)
-        problem = Problem(grade, chapter, book, title, num_choice, ans_mcq, ans_saq, id, created)
+        problem = Problem(
+            grade, chapter, 
+            book, title, 
+            num_choice, 
+            ans_mcq, ans_saq, 
+            id, created
+            )
         
         for key, answer in problem.ans_saq.items():
             answer: str

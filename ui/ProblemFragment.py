@@ -108,7 +108,9 @@ class ProblemFragment(Fragment):
             pixmap = QPixmap()
             pixmap.loadFromData(data)
             scaled = pixmap.scaled(
-                label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+                label.size(), 
+                Qt.AspectRatioMode.KeepAspectRatio, 
+                Qt.TransformationMode.SmoothTransformation
             )
             label.setPixmap(scaled)
         else:
@@ -120,7 +122,9 @@ class ProblemFragment(Fragment):
             pixmap = QPixmap()
             pixmap.loadFromData(data)
             scaled = pixmap.scaled(
-                label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+                label.size(),
+                Qt.AspectRatioMode.KeepAspectRatio, 
+                Qt.TransformationMode.SmoothTransformation
             )
             label.setPixmap(scaled)
         else:
@@ -213,7 +217,7 @@ class ProblemFragment(Fragment):
         self.label_image_main = QLabel()
         self.label_image_main.setObjectName("picture")
         self.label_image_main.setFixedSize(330, 420)
-        self.label_image_main.setAlignment(Qt.AlignCenter)
+        self.label_image_main.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout_problem_images.addWidget(self.label_image_main)
 
         self.layout_problem_images.addSpacing(8)
@@ -221,7 +225,7 @@ class ProblemFragment(Fragment):
         self.label_image_sub = QLabel()
         self.label_image_sub.setObjectName("picture")
         self.label_image_sub.setFixedSize(330, 420)
-        self.label_image_sub.setAlignment(Qt.AlignCenter)
+        self.label_image_sub.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout_problem_images.addWidget(self.label_image_sub)
 
         # contents (mcq or saq)
@@ -273,7 +277,9 @@ class ProblemFragment(Fragment):
         tw.setEditTriggers(QAbstractItemView.NoEditTriggers)
         tw.setSelectionMode(QTableWidget.SingleSelection)
         tw.setSelectionBehavior(QTableWidget.SelectRows)
-        tw.verticalHeader().setVisible(False)
+        verticalHeader = tw.verticalHeader()
+        if verticalHeader is not None:
+            verticalHeader.setVisible(False)
         tw.setHorizontalHeaderLabels(["학년", "단원", "교재", "문제"])
 
         tw.cellClicked.connect(self.view_model.on_problem_click)

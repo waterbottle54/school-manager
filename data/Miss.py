@@ -45,6 +45,7 @@ class Miss:
             "created": self.created,
         }
 
+    @staticmethod
     def from_record(
         id: int,
         student_id: int,

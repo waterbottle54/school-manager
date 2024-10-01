@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
+    QHeaderView
 )
 
 from common.StringRes import *
@@ -92,7 +93,7 @@ class StudentFragment(Fragment):
         return item
 
     def update_student_selection(self, row):
-        if row >= 0 or row < self.tw_student.rowCount():
+        if row >= 0 and row < self.tw_student.rowCount():
             self.tw_student.selectRow(row)
             self.tw_student.setFocus()
 
@@ -109,9 +110,9 @@ class StudentFragment(Fragment):
         self.tw_student.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tw_student.setSelectionMode(QTableWidget.SingleSelection)
         self.tw_student.setSelectionBehavior(QTableWidget.SelectRows)
-        vertical_header = self.tw_student.verticalHeader()
+        vertical_header: QHeaderView = self.tw_student.verticalHeader()
         if vertical_header is not None:
-            vertical_header.setEnabled(False)
+            vertical_header.setVisible(False)
         self.tw_student.setHorizontalHeaderLabels(["학년", "이름", "학교"])
 
         self.tw_student.cellClicked.connect(self.view_model.on_student_click)

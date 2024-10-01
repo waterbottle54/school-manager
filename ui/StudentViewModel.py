@@ -91,4 +91,4 @@ class StudentViewModel(QObject):
 
     def update_student_list(self):
         list = self.student_repository.query()
-        self.student_list.set_value(list if list is not None else [])
+        self.student_list.set_value(list)

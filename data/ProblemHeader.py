@@ -23,6 +23,6 @@ class ProblemHeader:
             and self.title == problem.title
         )
 
-
-def header_from_problem(problem: Problem) -> ProblemHeader:
-    return ProblemHeader(problem.grade, problem.chapter, problem.book, problem.title)
+    @staticmethod
+    def from_problem(problem: Problem):
+        return ProblemHeader(problem.grade, problem.chapter, problem.book, problem.title)
