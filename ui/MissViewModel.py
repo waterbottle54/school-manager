@@ -39,15 +39,15 @@ class MissViewModel(QObject):
 
     student: Student|None
 
-    miss_list: MutableLiveData
-    current_miss_index: MutableLiveData
-    current_miss: LiveData
+    miss_list: MutableLiveData[list[Miss]]
+    current_miss_index: MutableLiveData[int]
+    current_miss: LiveData[Miss|None]
 
-    image_main: LiveData
-    image_sub: LiveData
+    image_main: LiveData[bytes|None]
+    image_sub: LiveData[bytes|None]
 
-    can_delete_miss: LiveData
-    can_modify_problem: LiveData
+    can_delete_miss: LiveData[bool]
+    can_modify_problem: LiveData[bool]
 
     def __init__(self):
         super().__init__()
@@ -92,7 +92,7 @@ class MissViewModel(QObject):
         self._update_miss_list()
 
     def on_result(self, data: dict):
-        if data is None:
+        if (data is not None) and (self.student is not None):
             problem: Problem = data["problem"]
             miss = Miss(self.student.id, problem.id, ProblemHeader.from_problem(problem))
             print(str(miss.to_record()))
@@ -113,11 +113,12 @@ class MissViewModel(QObject):
     def on_delete_message_confirm(self, miss: Miss):
         self.miss_repository.delete(miss.id)
         self._update_miss_list()
+        if self.current_miss.value is None:
+            self._reset_miss_index(False)
 
     def on_problem_header_result(self, header: ProblemHeader):
-        if header is None or self.student is None:
+        if (header is None) or (self.student is None):
             return
-
         problem_existing = self.problem_repository.query_by_header(header)
         if len(problem_existing) > 0:
             problem: Problem = problem_existing[0]
@@ -129,15 +130,26 @@ class MissViewModel(QObject):
 
     def _update_miss_list(self):
         if self.student is not None:
-            list = self.miss_repository.query_by_student_id(self.student.id)
-            self.miss_list.set_value(list)
-            if self.current_miss.value is None:
-                self._reset_miss_index()
+            miss_list = self.miss_repository.query_by_student_id(self.student.id)
+            self.miss_list.set_value(miss_list)
 
-    def _reset_miss_index(self):
-        list = self.miss_list.value
-        if (list is None) or (len(list) == 0):
+    def _select_miss_index(self, miss: Miss):
+        m_list = self.miss_list.value
+        if len(m_list) == 0:
             self.current_miss_index.set_value(-1)
+            return
+        try:
+            index = m_list.index(miss)
+            self.current_miss_index.set_value(index)
+        except ValueError:
+            self.current_miss_index.set_value(-1)
+            
+    def _reset_miss_index(self, begin_or_end: bool=True):
+        m_list = self.miss_list.value
+        if len(m_list) == 0:
+            self.current_miss_index.set_value(-1)
+            return
+        if begin_or_end:
+                self.current_miss_index.set_value(0)
         else:
-            self.current_miss_index.set_value(0)
-
+            self.current_miss_index.set_value(len(m_list) - 1)

@@ -1,64 +1,82 @@
+from typing import Callable, TypeVar
 
-from typing import Generic, TypeVar
 
+T = TypeVar('T')  # Define the type variable
 
-class LiveData:
+class LiveData[T]:
 
-    value = None
-    observers: list | None = None
+    value: T
+    observers: list
 
-    def __init__(self, value):
+    def __init__(self, value: T):
         self.value = value
         self.observers = []
     
-    def _set_value(self, value):
-        if self.observers is not None:
-            self.value = value
-            for observer in self.observers:
-                observer(self.value)
+    def _set_value(self, value: T):
+        self.value = value
+        for observer in self.observers:
+            observer(self.value)  
 
     def _publish(self):
         self._set_value(self.value)
 
     def observe(self, observer):
-        if (self.observers is not None) and (observer is not None):
+        if observer is not None:
             observer(self.value)
             self.observers.append(observer)
             if self.value is not None:
                 observer(self.value)
 
-class MutableLiveData(LiveData):
-    def __init__(self, value):
+class MutableLiveData[T](LiveData[T]):
+    def __init__(self, value: T):
         super().__init__(value)
 
-    def set_value(self, value):
+    def set_value(self, value: T):
         super()._set_value(value)
         
     def publish(self):
         super()._publish()
 
-def map(source, t):
-    data = LiveData(None)
+def map[S, T](
+        source: LiveData[S], 
+        t: Callable[[S], T]
+        ) -> LiveData[T]:
+    data = LiveData(t(source.value))
     source.observe(lambda value: data._set_value(t(value)))
     return data
 
-def map2(source1, source2, t):
-    data = LiveData(None)
-    source1.observe(lambda value: data._set_value(t(value, source2.value)))
-    source2.observe(lambda value: data._set_value(t(source1.value, value)))
+def map2[S1, S2, T](
+        s1: LiveData[S1], 
+        s2: LiveData[S2], 
+        t: Callable[[S1, S2], T]
+        ) -> LiveData[T]:
+    data = LiveData(t(s1.value, s2.value))
+    s1.observe(lambda value: data._set_value(t(value, s2.value)))
+    s2.observe(lambda value: data._set_value(t(s1.value, value)))
     return data
 
-def map3(source1, source2, source3, t):
-    data = LiveData(None)
-    source1.observe(lambda value: data._set_value(t(value, source2.value, source3.value)))
-    source2.observe(lambda value: data._set_value(t(source1.value, value, source3.value)))
-    source3.observe(lambda value: data._set_value(t(source1.value, source2.value, value)))
+def map3[S1, S2, S3, T](
+        s1: LiveData[S1], 
+        s2: LiveData[S2], 
+        s3: LiveData[S3],
+        t: Callable[[S1, S2, S3], T]
+        ) -> LiveData[T]:
+    data = LiveData(t(s1.value, s2.value, s3.value))
+    s1.observe(lambda value: data._set_value(t(value, s2.value, s3.value)))
+    s2.observe(lambda value: data._set_value(t(s1.value, value, s3.value)))
+    s3.observe(lambda value: data._set_value(t(s1.value, s2.value, value)))
     return data
 
-def map4(source1, source2, source3, source4, t):
-    data = LiveData(None)
-    source1.observe(lambda value: data._set_value(t(value, source2.value, source3.value, source4.value)))
-    source2.observe(lambda value: data._set_value(t(source1.value, value, source3.value, source4.value)))
-    source3.observe(lambda value: data._set_value(t(source1.value, source2.value, value, source4.value)))
-    source4.observe(lambda value: data._set_value(t(source1.value, source2.value, source3.value, value)))
+def map4[S1, S2, S3, S4, T](
+        s1: LiveData[S1], 
+        s2: LiveData[S2], 
+        s3: LiveData[S3],
+        s4: LiveData[S4],
+        t: Callable[[S1, S2, S3, S4], T]
+        ) -> LiveData[T]:
+    data = LiveData(t(s1.value, s2.value, s3.value, s4.value))
+    s1.observe(lambda value: data._set_value(t(value, s2.value, s3.value, s4.value)))
+    s2.observe(lambda value: data._set_value(t(s1.value, value, s3.value, s4.value)))
+    s3.observe(lambda value: data._set_value(t(s1.value, s2.value, value, s4.value)))
+    s4.observe(lambda value: data._set_value(t(s1.value, s2.value, s3.value, value)))
     return data

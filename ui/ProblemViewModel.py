@@ -158,7 +158,8 @@ class ProblemViewModel(QObject):
         self.range_num_choice = range(3, 9)
 
     def on_resume(self):
-        self.current_chapter_index.publish()
+        if self.current_problem.value is None:
+            self._reset_problem_index()
 
     def on_problem_click(self, row, column):
         self.current_problem_index.set_value(row)
@@ -201,10 +202,26 @@ class ProblemViewModel(QObject):
 
     def on_delete_probem_confirmed(self, problem: Problem):
         self.problem_repository.delete(problem.id)
-        self.current_chapter_index.publish()
+        if self.current_problem.value is None:
+            self._reset_problem_index()
 
     def on_modify_problem_click(self):
         problem = self.current_problem.value
         if problem is not None:
             header = ProblemHeader.from_problem(problem)
             self.event.emit(ProblemViewModel.NavigateToAddProblem(header))
+
+    def _update_problem_list(self):
+        list = self.problem_repository.query_by_header(self.proh)
+        self.miss_list.set_value(list)
+        if self.current_miss.value is None:
+            self._reset_miss_index()
+         
+
+    def _reset_problem_index(self):
+        list = self.problem_list.value
+        if (list is None) or (len(list) == 0):
+            self.current_problem_index.set_value(-1)
+        else:
+            self.current_problem_index.set_value(0)
+

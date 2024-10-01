@@ -31,6 +31,11 @@ class MissFragment(Fragment):
         self.buttonAddMiss.clicked.connect(self.view_model.on_add_miss_click)
         self.buttonDeleteMiss.clicked.connect(self.view_model.on_delete_miss_click)
 
+        self.labelImageMain: QLabel
+        self.labelImageSub: QLabel
+        self.labelImageMain.setScaledContents(True)
+        self.labelImageSub.setScaledContents(True)
+
         self.view_model.miss_list.observe(self._update_miss_table)
         self.view_model.current_miss_index.observe(self._update_miss_selection)
         self.view_model.current_miss.observe(self._update_miss_detail)
@@ -90,31 +95,19 @@ class MissFragment(Fragment):
 
     def _update_main_image(self, image_data: bytes | None):
         label: QLabel = self.labelImageMain
-        label.setScaledContents(True)
         if image_data is not None:
             pixmap = QPixmap()
             pixmap.loadFromData(image_data)
-            scaled = pixmap.scaled(
-                label.size(), 
-                Qt.AspectRatioMode.KeepAspectRatio, 
-                Qt.TransformationMode.SmoothTransformation
-            )
-            label.setPixmap(scaled)
+            label.setPixmap(pixmap)
         else:
             label.clear()
 
     def _update_sub_image(self, image_data: bytes | None):
         label: QLabel = self.labelImageSub
-        label.setScaledContents(True)
         if image_data is not None:
             pixmap = QPixmap()
             pixmap.loadFromData(image_data)
-            scaled = pixmap.scaled(
-                label.size(), 
-                Qt.AspectRatioMode.KeepAspectRatio, 
-                Qt.TransformationMode.SmoothTransformation
-            )
-            label.setPixmap(scaled)
+            label.setPixmap(pixmap)
         else:
             label.clear()
 

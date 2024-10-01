@@ -21,6 +21,7 @@ class ImageRepository:
         path = self.get_problem_image_path(header, is_main)
         try:
             with open(path, "rb") as file:
+                print('load image')
                 return file.read()
         except FileNotFoundError:
             return None
