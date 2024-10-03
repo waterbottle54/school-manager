@@ -1,9 +1,11 @@
 import sqlite3
 
+
 class DatabaseConnection:
-    def __init__(self, db_name):
+
+    def __init__(self, db_name: str):
         self.db_name = db_name
-        self.connection = None
+        self.connection: sqlite3.Connection | None = None
 
     def __enter__(self):
         # Establish the connection
@@ -15,5 +17,3 @@ class DatabaseConnection:
         # Close the connection
         if self.connection:
             self.connection.close()
-
-    

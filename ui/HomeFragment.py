@@ -27,7 +27,7 @@ class HomeFragment(Fragment):
 
     def on_event(self, event):
         if isinstance(event, HomeViewModel.NavigateToAdminScreen):
-            Navigation._instance.navigate(AdminFragment)
+            Navigation.get_instance().navigate(AdminFragment)
 
     def paintEvent(self, event):
         p = QPainter(self)
@@ -37,7 +37,7 @@ class HomeFragment(Fragment):
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignHCenter)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(layout)
 
         label = QLabel("이름을 입력해주세요")

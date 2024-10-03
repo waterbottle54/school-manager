@@ -13,7 +13,7 @@ class Fragment(QFrame):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     @abstractmethod
-    def on_start(self, arguments: dict = None):
+    def on_start(self, arguments: dict|None = None):
         pass
 
     @abstractmethod
@@ -21,7 +21,7 @@ class Fragment(QFrame):
         pass
 
     @abstractmethod
-    def on_restart(self, result: dict = None):
+    def on_restart(self, result: dict|None = None):
         pass
     
     @abstractmethod

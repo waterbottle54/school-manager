@@ -7,29 +7,29 @@ from ui.DataFragment import *
 from ui.StudentFragment import *
 from ui.ProblemFragment import *
 
+
 class AdminFragment(Fragment):
 
     view_model: AdminViewModel
-
 
     def __init__(self, title):
         super().__init__(title)
 
         self.view_model = AdminViewModel()
-        
+
         self.setup_ui()
 
         self.view_model.event.connect(self.on_event)
 
     def on_event(self, event):
         if isinstance(event, AdminViewModel.NavigateBack):
-            Navigation._instance.navigate_back()
+            Navigation.get_instance().navigate_back()
         elif isinstance(event, AdminViewModel.NavigateToDataFragment):
-            Navigation._instance.navigate(DataFragment)
+            Navigation.get_instance().navigate(DataFragment)
         elif isinstance(event, AdminViewModel.NavigateToStudentFragment):
-            Navigation._instance.navigate(StudentFragment)
+            Navigation.get_instance().navigate(StudentFragment)
         elif isinstance(event, AdminViewModel.NavigateToProblemFragment):
-            Navigation._instance.navigate(ProblemFragment)
+            Navigation.get_instance().navigate(ProblemFragment)
 
     def setup_ui(self):
         layout_buttons = QGridLayout()
@@ -45,19 +45,19 @@ class AdminFragment(Fragment):
         button_data.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         button_back.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        button_student.setIcon(QIcon('images/student.png'))
+        button_student.setIcon(QIcon("images/student.png"))
         button_student.setIconSize(QSize(300, 300))
         button_student.clicked.connect(self.view_model.on_student_click)
 
-        button_problem.setIcon(QIcon('images/document.png'))
+        button_problem.setIcon(QIcon("images/document.png"))
         button_problem.setIconSize(QSize(256, 256))
         button_problem.clicked.connect(self.view_model.on_problem_click)
 
-        button_data.setIcon(QIcon('images/db.png'))
+        button_data.setIcon(QIcon("images/db.png"))
         button_data.setIconSize(QSize(256, 256))
         button_data.clicked.connect(self.view_model.on_data_click)
 
-        button_back.setIcon(QIcon('images/back.png'))
+        button_back.setIcon(QIcon("images/back.png"))
         button_back.setIconSize(QSize(192, 192))
         button_back.clicked.connect(self.view_model.on_back_click)
 

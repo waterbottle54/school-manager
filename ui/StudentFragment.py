@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
-    QHeaderView
+    QHeaderView,
 )
 
 from common.StringRes import *
@@ -60,7 +60,7 @@ class StudentFragment(Fragment):
 
     def on_event(self, event: StudentViewModel.Event):
         if isinstance(event, StudentViewModel.NavigateToMissScreen):
-            Navigation._instance.navigate(MissFragment, {"student": event.student})
+            Navigation.get_instance().navigate(MissFragment, {"student": event.student})
         elif isinstance(event, StudentViewModel.PromptStudent):
             self.prompt_student()
         elif isinstance(event, StudentViewModel.ConfirmDeleteStudent):

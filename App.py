@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QFontDatabase, QKeyEvent
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout
 
 from ui.AddProblemFragment import *
 from ui.AdminFragment import *
@@ -17,32 +17,27 @@ from ui.StudentFragment import *
 
 class MainWindow(QMainWindow):
 
-    navigation: Navigation
-    layout: QVBoxLayout
-    container: QWidget
-    toolbar: Toolbar
-
     def __init__(self):
         super().__init__()
-        self.set_stylesheet()
+
+        self.navigation: Navigation
+        self.container = QWidget()
+        self.toolbar = Toolbar()
 
         self.setWindowTitle("BrainScan")
         self.setGeometry(0, 0, 1280, 740)
+        self.set_stylesheet()
 
         central_widget = QWidget()
+        layout_top = QVBoxLayout()
+        central_widget.setLayout(layout_top)
         self.setCentralWidget(central_widget)
 
-        self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        central_widget.setLayout(self.layout)
+        layout_top.setContentsMargins(0, 0, 0, 0)
+        layout_top.addWidget(self.toolbar)
+        layout_top.addWidget(self.container)
 
-        self.toolbar = Toolbar()
-        self.layout.addWidget(self.toolbar)
-
-        self.container = QWidget()
-        self.layout.addWidget(self.container)
-
-        self.graph = {
+        graph = {
             HomeFragment: HomeFragment("홈"),
             AdminFragment: AdminFragment("관리자"),
             DataFragment: DataFragment("데이터 관리"),
@@ -51,14 +46,13 @@ class MainWindow(QMainWindow):
             AddProblemFragment: AddProblemFragment("문제 추가"),
             MissFragment: MissFragment("오답 관리"),
         }
-        self.navigation = Navigation(self.container, self.graph, HomeFragment)
+        self.navigation = Navigation(self.container, graph, HomeFragment)
         self.navigation.setup_with_toolbar(self.toolbar)
-        self.navigation.set_back_stack_changed_listener(
+        self.navigation.set_back_stack_change_listener(
             lambda fragment: self.toolbar.setVisible(
                 not isinstance(fragment, HomeFragment)
             )
         )
-
         self.navigation.navigate(HomeFragment)
 
     def keyPressEvent(self, event: QKeyEvent | None) -> None:

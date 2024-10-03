@@ -49,7 +49,7 @@ class MissFragment(Fragment):
     def on_start(self, argument: dict):
         self.view_model.on_start(argument)
         student: Student = argument["student"]
-        self.title = re.sub(r'\s*\(.*?\)', '', self.title).strip()
+        self.title = re.sub(r"\s*\(.*?\)", "", self.title).strip()
         self.title += f" ({student.name})"
 
     def on_restart(self, result: dict):
@@ -62,9 +62,8 @@ class MissFragment(Fragment):
                 problem_header = dialog.get_problem_header()
                 self.view_model.on_problem_header_result(problem_header)
         if isinstance(event, MissViewModel.NavigationToAddProblemScreen):
-            Navigation._instance.navigate(
-                AddProblemFragment, 
-                {"problem_header": event.problem_header}
+            Navigation.get_instance().navigate(
+                AddProblemFragment, {"problem_header": event.problem_header}
             )
         if isinstance(event, MissViewModel.ConfirmDeleteMiss):
             self._confirm_delete_miss(event.miss)
@@ -113,9 +112,9 @@ class MissFragment(Fragment):
 
     def _confirm_delete_miss(self, miss: Miss):
         mb = QMessageBox()
-        mb.setWindowTitle('오답 삭제')
+        mb.setWindowTitle("오답 삭제")
         mb.setText(f'오답 "{miss.problem_header.title}"을 삭제하시겠습니까?')
-        mb.setStandardButtons(QMessageBox.Ok|QMessageBox.Cancel)
+        mb.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         if mb.exec_() == QMessageBox.Ok:
             self.view_model.on_delete_message_confirm(miss)
 
@@ -130,5 +129,3 @@ class MissFragment(Fragment):
         table.setColumnWidth(5, int(tableWidth * 2 / 11))
         table.setColumnWidth(6, int(tableWidth * 1 / 11))
         table.cellClicked.connect(self.view_model.on_miss_selected)
-
-    

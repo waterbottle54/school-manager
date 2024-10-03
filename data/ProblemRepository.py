@@ -26,7 +26,7 @@ class ProblemRepository(DatabaseRepository):
             """,
         )
 
-    def to_object(self, row):
+    def to_object(self, row) -> Problem:
         id = row[0]
         grade = row[1]
         chapter = row[2]
@@ -43,7 +43,7 @@ class ProblemRepository(DatabaseRepository):
     def query_all(self) -> list:
         return super().query(f"SELECT * FROM {self.table_name} ORDER BY created DESC")
 
-    def query(self, book, grade, chapter) -> list:
+    def query(self, book: str, grade: int, chapter: str) -> list[Problem]:
         ordering = """
             ORDER BY CASE 
             WHEN title NOT LIKE "%[^0-9]%" 
@@ -62,7 +62,7 @@ class ProblemRepository(DatabaseRepository):
             (book, grade, chapter),
         )
 
-    def query_by_header(self, h: ProblemHeader) -> list:
+    def query_by_header(self, h: ProblemHeader) -> list[Problem]:
         return super().query(
             f"""
             SELECT * FROM {self.table_name} 

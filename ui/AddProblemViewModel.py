@@ -5,7 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from common.LiveData import *
 from data.BookRepository import *
 from data.ChapterRepository import *
-from data.common.ListDictRepository import *
+from data.common.DictOfListRepository import *
 from data.common.ListRepository import *
 from data.ImageRepository import *
 from data.Problem import *

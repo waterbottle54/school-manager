@@ -4,14 +4,9 @@ from data.common.DatabaseConnection import *
 from abc import ABC
 
 
-class DatabaseRepository(ABC):
+class DatabaseRepository[T](ABC):
 
-    db_name: str
-    table_name: str
-    pk_name: str
-    version: int
-
-    def __init__(self, db_name, table_name, pk_name, version):
+    def __init__(self, db_name: str, table_name: str, pk_name: str, version: int):
 
         self.db_name = db_name
         self.table_name = table_name
@@ -36,7 +31,7 @@ class DatabaseRepository(ABC):
             if result is None:
                 self.on_create_table(db)
 
-    def get_db_version(self, db: DatabaseConnection):
+    def get_db_version(self, db: DatabaseConnection) -> int:
         db.cursor.execute("CREATE TABLE IF NOT EXISTS version_info (version INTEGER)")
         db.cursor.execute("SELECT version FROM version_info")
         result = db.cursor.fetchone()
@@ -55,23 +50,23 @@ class DatabaseRepository(ABC):
         pass
 
     @abstractmethod
-    def to_object(self, row):
+    def to_object(self, record: list[object]) -> T:
         pass
 
-    def query(self, sql, args=tuple()) -> list:
-        list = []
+    def query(self, sql, args: tuple[object] = tuple()) -> list[T]:
+        result_list = list[T]()
         with DatabaseConnection(self.db_name) as db:
             db.cursor.execute(sql, args)
             if db.connection is not None:
                 db.connection.commit()
-            rows = db.cursor.fetchall()
-            for row in rows:
-                objects = self.to_object(row)
-                list.append(objects)
-        return list
+            records: list[list[object]] = db.cursor.fetchall()
+            for record in records:
+                _object = self.to_object(record)
+                result_list.append(_object)
+        return result_list
 
-    def insert(self, data: dict, auto_key: bool):
-        if auto_key:
+    def insert(self, data: dict[str, object], need_generate_key: bool):
+        if need_generate_key:
             del data[self.pk_name]
 
         columns = ", ".join(data.keys())
@@ -84,7 +79,7 @@ class DatabaseRepository(ABC):
             if db.connection is not None:
                 db.connection.commit()
 
-    def update(self, data: dict):
+    def update(self, data: dict[str, object]):
         id = data.pop(self.pk_name)
         columns = ", ".join([f"{key} = ?" for key in data.keys()])
         with DatabaseConnection(self.db_name) as db:
@@ -98,7 +93,7 @@ class DatabaseRepository(ABC):
             if db.connection is not None:
                 db.connection.commit()
 
-    def delete(self, id):
+    def delete(self, id: int | str):
         with DatabaseConnection(self.db_name) as db:
             db.cursor.execute(
                 f"DELETE FROM {self.table_name} WHERE {self.pk_name} = ?", (id,)
@@ -106,7 +101,7 @@ class DatabaseRepository(ABC):
             if db.connection is not None:
                 db.connection.commit()
 
-    def format_value(self, value):
+    def format_value(self, value: object) -> str:
         if isinstance(value, str):
             return f"'{value}'"
         return str(value)

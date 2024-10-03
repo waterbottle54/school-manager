@@ -1,9 +1,10 @@
+from data.Miss import Miss
 from data.common.DatabaseConnection import DatabaseConnection
 from data.common.DatabaseRepository import *
 from data.Miss import *
 
 
-class MissRepository(DatabaseRepository):
+class MissRepository(DatabaseRepository[Miss]):
 
     def __init__(self):
         super().__init__("db_app", "miss", "m_id", 1)
@@ -26,29 +27,8 @@ class MissRepository(DatabaseRepository):
             """
         )
 
-    def to_object(self, row):
-        id = row[0]
-        student_id = row[1]
-        problem_id = row[2]
-        grade = row[3]
-        chapter = row[4]
-        book = row[5]
-        title = row[6]
-        record = row[7]
-        updated = row[8]
-        created = row[9]
-        return Miss.from_record(
-            id,
-            student_id,
-            problem_id,
-            grade,
-            chapter,
-            book,
-            title,
-            record,
-            updated,
-            created,
-        )
+    def to_object(self, record: list[object]) -> Miss:
+        return Miss.from_record(record)
 
     def query(self, m_id: int) -> list:
         return super().query(f"SELECT * FROM {self.table_name} WHERE m_id = ?", (m_id,))

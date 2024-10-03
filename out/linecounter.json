@@ -1,0 +1,860 @@
+{
+    "extension": "linecounter",
+    "version": "0.2.7",
+    "workspace": "c:\\Users\\kamut\\OneDrive\\Desktop\\brainscan",
+    "linecount": [
+        {
+            "version": "0.2.7",
+            "counttime": "2024-10-01 20:31:19",
+            "filesum": 122,
+            "codesum": 3277,
+            "commentsum": 32,
+            "blanksum": 782,
+            "statistics": {
+                ".py": {
+                    "code": 2697,
+                    "comment": 22,
+                    "blank": 728
+                },
+                "": {
+                    "code": 145,
+                    "comment": 4,
+                    "blank": 38
+                },
+                ".qss": {
+                    "code": 47,
+                    "comment": 0,
+                    "blank": 10
+                },
+                ".json": {
+                    "code": 3,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".ui": {
+                    "code": 310,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".cfg": {
+                    "code": 2,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".toml": {
+                    "code": 4,
+                    "comment": 0,
+                    "blank": 1
+                },
+                ".bat": {
+                    "code": 35,
+                    "comment": 0,
+                    "blank": 5
+                },
+                ".yaml": {
+                    "code": 34,
+                    "comment": 6,
+                    "blank": 0
+                }
+            },
+            "filelist": [
+                {
+                    "blank": 0,
+                    "code": 9,
+                    "comment": 0,
+                    "filename": ".trunk\\.gitignore"
+                },
+                {
+                    "blank": 0,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": ".trunk\\configs\\.isort.cfg"
+                },
+                {
+                    "blank": 1,
+                    "code": 4,
+                    "comment": 0,
+                    "filename": ".trunk\\configs\\ruff.toml"
+                },
+                {
+                    "blank": 1,
+                    "code": 8,
+                    "comment": 0,
+                    "filename": ".trunk\\tools\\black.bat"
+                },
+                {
+                    "blank": 1,
+                    "code": 8,
+                    "comment": 0,
+                    "filename": ".trunk\\tools\\checkov.bat"
+                },
+                {
+                    "blank": 1,
+                    "code": 8,
+                    "comment": 0,
+                    "filename": ".trunk\\tools\\isort.bat"
+                },
+                {
+                    "blank": 1,
+                    "code": 7,
+                    "comment": 0,
+                    "filename": ".trunk\\tools\\prettier.bat"
+                },
+                {
+                    "blank": 1,
+                    "code": 4,
+                    "comment": 0,
+                    "filename": ".trunk\\tools\\trufflehog.bat"
+                },
+                {
+                    "blank": 38,
+                    "code": 136,
+                    "comment": 4,
+                    "filename": ".trunk\\tools\\trunk"
+                },
+                {
+                    "blank": 0,
+                    "code": 34,
+                    "comment": 6,
+                    "filename": ".trunk\\trunk.yaml"
+                },
+                {
+                    "blank": 19,
+                    "code": 62,
+                    "comment": 0,
+                    "filename": "App.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "book.json"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "chapter.json"
+                },
+                {
+                    "filename": "common\\__pycache__\\LiveData.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "common\\__pycache__\\StringRes.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "common\\__pycache__\\Utils.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 15,
+                    "code": 67,
+                    "comment": 1,
+                    "filename": "common\\LiveData.py"
+                },
+                {
+                    "blank": 2,
+                    "code": 8,
+                    "comment": 0,
+                    "filename": "common\\StringRes.py"
+                },
+                {
+                    "blank": 4,
+                    "code": 21,
+                    "comment": 0,
+                    "filename": "common\\Utils.py"
+                },
+                {
+                    "filename": "data\\__pycache__\\BookRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\ChapterRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\ImageRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\Miss.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\MissRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\Problem.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\ProblemHeader.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\ProblemRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\SchoolRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\Student.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\__pycache__\\StudentRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 3,
+                    "code": 4,
+                    "comment": 0,
+                    "filename": "data\\BookRepository.py"
+                },
+                {
+                    "blank": 3,
+                    "code": 4,
+                    "comment": 0,
+                    "filename": "data\\ChapterRepository.py"
+                },
+                {
+                    "filename": "data\\common\\__pycache__\\DatabaseConnection.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\common\\__pycache__\\DatabaseRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\common\\__pycache__\\DictOfListRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\common\\__pycache__\\JsonStream.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\common\\__pycache__\\ListDictRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "data\\common\\__pycache__\\ListRepository.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 4,
+                    "code": 12,
+                    "comment": 2,
+                    "filename": "data\\common\\DatabaseConnection.py"
+                },
+                {
+                    "blank": 19,
+                    "code": 91,
+                    "comment": 2,
+                    "filename": "data\\common\\DatabaseRepository.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 42,
+                    "comment": 0,
+                    "filename": "data\\common\\DictOfListRepository.py"
+                },
+                {
+                    "blank": 5,
+                    "code": 15,
+                    "comment": 0,
+                    "filename": "data\\common\\JsonStream.py"
+                },
+                {
+                    "blank": 6,
+                    "code": 19,
+                    "comment": 0,
+                    "filename": "data\\common\\ListRepository.py"
+                },
+                {
+                    "blank": 8,
+                    "code": 30,
+                    "comment": 0,
+                    "filename": "data\\ImageRepository.py"
+                },
+                {
+                    "blank": 7,
+                    "code": 57,
+                    "comment": 0,
+                    "filename": "data\\Miss.py"
+                },
+                {
+                    "blank": 10,
+                    "code": 46,
+                    "comment": 0,
+                    "filename": "data\\MissRepository.py"
+                },
+                {
+                    "blank": 9,
+                    "code": 65,
+                    "comment": 2,
+                    "filename": "data\\Problem.py"
+                },
+                {
+                    "blank": 5,
+                    "code": 23,
+                    "comment": 0,
+                    "filename": "data\\ProblemHeader.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 43,
+                    "comment": 0,
+                    "filename": "data\\ProblemRepository.py"
+                },
+                {
+                    "blank": 2,
+                    "code": 4,
+                    "comment": 0,
+                    "filename": "data\\SchoolRepository.py"
+                },
+                {
+                    "blank": 3,
+                    "code": 22,
+                    "comment": 0,
+                    "filename": "data\\Student.py"
+                },
+                {
+                    "blank": 8,
+                    "code": 23,
+                    "comment": 0,
+                    "filename": "data\\StudentRepository.py"
+                },
+                {
+                    "filename": "db_app",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "fonts\\hakyo_B.ttf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "fonts\\hakyo_R.ttf",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 310,
+                    "comment": 0,
+                    "filename": "forms\\Miss.ui"
+                },
+                {
+                    "filename": "images\\back.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images\\cosmos.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images\\db.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images\\document.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images\\problem.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images\\student.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images\\student.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\별의성질\\오투-8(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-11(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-2(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-20(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-3(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-33(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-33(sub).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-4(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-44(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-5(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-55(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\오투-7(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\세포분열\\체크체크-7(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "images_problem\\grade8\\역학적에너지\\오투-11(main).png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "school.json"
+                },
+                {
+                    "filename": "ui\\__pycache__\\AddProblemFragment.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\AddProblemViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\AddStudentDialog.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\AdminFragment.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\AdminViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\DataFragment.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\DataViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\HomeFragment.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\HomeViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\MissFragment.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\MissViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\ProblemFragment.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\ProblemViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\PromptProblemHeaderDialog.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\PromptProblemHeaderViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\StudentFragment.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\__pycache__\\StudentViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 50,
+                    "code": 209,
+                    "comment": 4,
+                    "filename": "ui\\AddProblemFragment.py"
+                },
+                {
+                    "blank": 41,
+                    "code": 137,
+                    "comment": 0,
+                    "filename": "ui\\AddProblemViewModel.py"
+                },
+                {
+                    "blank": 16,
+                    "code": 51,
+                    "comment": 0,
+                    "filename": "ui\\AdminFragment.py"
+                },
+                {
+                    "blank": 12,
+                    "code": 24,
+                    "comment": 0,
+                    "filename": "ui\\AdminViewModel.py"
+                },
+                {
+                    "blank": 8,
+                    "code": 21,
+                    "comment": 0,
+                    "filename": "ui\\common\\Fragment.py"
+                },
+                {
+                    "blank": 26,
+                    "code": 71,
+                    "comment": 0,
+                    "filename": "ui\\common\\Navigation.py"
+                },
+                {
+                    "blank": 2,
+                    "code": 4,
+                    "comment": 2,
+                    "filename": "ui\\common\\NonClickableCheckBox.py"
+                },
+                {
+                    "blank": 5,
+                    "code": 7,
+                    "comment": 0,
+                    "filename": "ui\\common\\Test.py"
+                },
+                {
+                    "blank": 6,
+                    "code": 16,
+                    "comment": 0,
+                    "filename": "ui\\common\\Toolbar.py"
+                },
+                {
+                    "blank": 2,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "ui\\common\\UiUtils.py"
+                },
+                {
+                    "blank": 49,
+                    "code": 183,
+                    "comment": 0,
+                    "filename": "ui\\DataFragment.py"
+                },
+                {
+                    "blank": 42,
+                    "code": 143,
+                    "comment": 0,
+                    "filename": "ui\\DataViewModel.py"
+                },
+                {
+                    "filename": "ui\\dialogs\\__pycache__\\AddStudentDialog.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\dialogs\\__pycache__\\PromptProblemHeaderDialog.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "ui\\dialogs\\__pycache__\\PromptProblemHeaderViewModel.cpython-312.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 27,
+                    "code": 95,
+                    "comment": 0,
+                    "filename": "ui\\dialogs\\AddStudentDialog.py"
+                },
+                {
+                    "blank": 24,
+                    "code": 83,
+                    "comment": 0,
+                    "filename": "ui\\dialogs\\PromptProblemHeaderDialog.py"
+                },
+                {
+                    "blank": 24,
+                    "code": 68,
+                    "comment": 0,
+                    "filename": "ui\\dialogs\\PromptProblemHeaderViewModel.py"
+                },
+                {
+                    "blank": 16,
+                    "code": 43,
+                    "comment": 0,
+                    "filename": "ui\\HomeFragment.py"
+                },
+                {
+                    "blank": 7,
+                    "code": 13,
+                    "comment": 0,
+                    "filename": "ui\\HomeViewModel.py"
+                },
+                {
+                    "blank": 23,
+                    "code": 110,
+                    "comment": 1,
+                    "filename": "ui\\MissFragment.py"
+                },
+                {
+                    "blank": 30,
+                    "code": 128,
+                    "comment": 0,
+                    "filename": "ui\\MissViewModel.py"
+                },
+                {
+                    "blank": 55,
+                    "code": 229,
+                    "comment": 6,
+                    "filename": "ui\\ProblemFragment.py"
+                },
+                {
+                    "blank": 45,
+                    "code": 198,
+                    "comment": 1,
+                    "filename": "ui\\ProblemViewModel.py"
+                },
+                {
+                    "blank": 38,
+                    "code": 132,
+                    "comment": 1,
+                    "filename": "ui\\StudentFragment.py"
+                },
+                {
+                    "blank": 26,
+                    "code": 68,
+                    "comment": 0,
+                    "filename": "ui\\StudentViewModel.py"
+                },
+                {
+                    "blank": 10,
+                    "code": 47,
+                    "comment": 0,
+                    "filename": "update_style.qss"
+                }
+            ]
+        }
+    ]
+}

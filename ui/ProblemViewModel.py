@@ -3,7 +3,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from common.LiveData import *
 from data.BookRepository import *
 from data.ChapterRepository import *
-from data.common.ListDictRepository import *
+from data.common.DictOfListRepository import *
 from data.common.ListRepository import *
 from data.ImageRepository import *
 from data.Problem import *
@@ -52,26 +52,27 @@ class ProblemViewModel(QObject):
     problem_repository: ProblemRepository
     image_repository: ImageRepository
 
-    book_list: list
-    current_book_index: MutableLiveData
-    current_book: LiveData
+    # TODO: change lists to MutableList so that data is updated whenever it's edited.
+    book_list: list[str]
+    current_book_index: MutableLiveData[int]
+    current_book: LiveData[str | None]
 
-    grade_list: list
-    current_grade_index: MutableLiveData
-    current_grade: LiveData
+    grade_list: list[int]
+    current_grade_index: MutableLiveData[int]
+    current_grade: LiveData[int | None]
 
-    chapter_list: LiveData
-    current_chapter_index: MutableLiveData
-    current_chapter: LiveData
+    chapter_list: LiveData[list[str]]
+    current_chapter_index: MutableLiveData[int]
+    current_chapter: LiveData[str | None]
 
-    problem_list: LiveData
-    current_problem_index: MutableLiveData
-    current_problem: LiveData
-    can_delete_problem: LiveData
-    can_modify_problem: LiveData
+    problem_list: LiveData[list[Problem]]
+    current_problem_index: MutableLiveData[int]
+    current_problem: LiveData[Problem | None]
+    can_delete_problem: LiveData[bool]
+    can_modify_problem: LiveData[bool]
 
-    image_main: LiveData
-    image_sub: LiveData
+    image_main: LiveData[bytes | None]
+    image_sub: LiveData[bytes | None]
 
     range_num_choice: range
 
@@ -98,7 +99,9 @@ class ProblemViewModel(QObject):
         self.chapter_list = map(
             self.current_grade,
             lambda grade: (
-                self.chapter_repository.get_list(grade) if grade is not None else []
+                self.chapter_repository.get_list_by_key(grade)
+                if grade is not None
+                else []
             ),
         )
 
@@ -114,9 +117,9 @@ class ProblemViewModel(QObject):
             self.current_grade,
             self.current_chapter,
             lambda book, grade, chapter: (
-                self.problem_repository.query(book, grade, chapter)
-                if None not in (book, grade, chapter)
-                else []
+                []
+                if (book is None) or (grade is None) or (chapter is None)
+                else self.problem_repository.query(book, grade, chapter)
             ),
         )
 
@@ -157,24 +160,28 @@ class ProblemViewModel(QObject):
 
         self.range_num_choice = range(3, 9)
 
+    def on_restart(self, problem: Problem):
+        self._update_problem_list()
+        self._select_problem_index(problem)
+
     def on_resume(self):
         if self.current_problem.value is None:
-            self._reset_problem_index()
+            self._reset_problem_index(True)
 
     def on_problem_click(self, row, column):
         self.current_problem_index.set_value(row)
 
     def on_book_change(self, index):
         self.current_book_index.set_value(index)
-        self.current_problem_index.set_value(-1)
+        self._reset_problem_index(True)
 
     def on_grade_change(self, index):
         self.current_grade_index.set_value(index)
-        self.current_problem_index.set_value(-1)
+        self._reset_problem_index(True)
 
     def on_chapter_change(self, index):
         self.current_chapter_index.set_value(index)
-        self.current_problem_index.set_value(-1)
+        self._reset_problem_index(True)
 
     def on_add_problem_click(self):
         grade = self.current_grade.value
@@ -202,8 +209,9 @@ class ProblemViewModel(QObject):
 
     def on_delete_probem_confirmed(self, problem: Problem):
         self.problem_repository.delete(problem.id)
+        self._update_problem_list()
         if self.current_problem.value is None:
-            self._reset_problem_index()
+            self._reset_problem_index(False)
 
     def on_modify_problem_click(self):
         problem = self.current_problem.value
@@ -212,16 +220,25 @@ class ProblemViewModel(QObject):
             self.event.emit(ProblemViewModel.NavigateToAddProblem(header))
 
     def _update_problem_list(self):
-        list = self.problem_repository.query_by_header(self.proh)
-        self.miss_list.set_value(list)
-        if self.current_miss.value is None:
-            self._reset_miss_index()
-         
+        self.current_chapter_index.publish()
 
-    def _reset_problem_index(self):
-        list = self.problem_list.value
-        if (list is None) or (len(list) == 0):
+    def _select_problem_index(self, problem: Problem):
+        p_list = self.problem_list.value
+        if len(p_list) == 0:
             self.current_problem_index.set_value(-1)
-        else:
-            self.current_problem_index.set_value(0)
+            return
+        try:
+            index = p_list.index(problem)
+            self.current_problem_index.set_value(index)
+        except ValueError:
+            self.current_problem_index.set_value(-1)
 
+    def _reset_problem_index(self, begin_or_end: bool):
+        p_list = self.problem_list.value
+        if len(p_list) == 0:
+            self.current_problem_index.set_value(-1)
+            return
+        if begin_or_end:
+            self.current_problem_index.set_value(0)
+        else:
+            self.current_problem_index.set_value(len(p_list) - 1)

@@ -55,7 +55,7 @@ class AddProblemFragment(Fragment):
         self.view_model.is_input_valid.observe(self.button_submit.setEnabled)
 
         self.view_model.event.connect(self.on_event)
-    
+
     def on_start(self, arguments: dict = None):
         super().on_start(arguments)
         problem_header = arguments["problem_header"]
@@ -64,9 +64,9 @@ class AddProblemFragment(Fragment):
 
     def on_event(self, event):
         if isinstance(event, AddProblemViewModel.NavigateBackWithResult):
-            Navigation._instance.navigate_back({"problem": event.problem})
+            Navigation.get_instance().navigate_back({"problem": event.problem})
         elif isinstance(event, AddProblemViewModel.NavigateBack):
-            Navigation._instance.navigate_back()
+            Navigation.get_instance().navigate_back()
         elif isinstance(event, AddProblemViewModel.PromptImageFile):
             self.select_image(event.is_main)
         elif isinstance(event, AddProblemViewModel.ConfirmDeleteImage):

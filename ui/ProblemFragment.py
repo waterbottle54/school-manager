@@ -65,13 +65,17 @@ class ProblemFragment(Fragment):
 
         self.view_model.event.connect(self.on_event)
 
+    def on_restart(self, result: dict | None = None):
+        if result is not None:
+            self.view_model.on_restart(result["problem"])
+
     def on_resume(self):
         self.view_model.on_resume()
 
     def on_event(self, event: ProblemViewModel.Event):
         if isinstance(event, ProblemViewModel.NavigateToAddProblem):
             arguments = {"problem_header": event.problem_header}
-            Navigation._instance.navigate(AddProblemFragment, arguments)
+            Navigation.get_instance().navigate(AddProblemFragment, arguments)
         elif isinstance(event, ProblemViewModel.PromptProblemHeader):
             dialog = PromptProblemHeaderDialog(event.grade, event.chapter, event.book)
             if dialog.exec_() == QDialog.Accepted:
@@ -108,9 +112,9 @@ class ProblemFragment(Fragment):
             pixmap = QPixmap()
             pixmap.loadFromData(data)
             scaled = pixmap.scaled(
-                label.size(), 
-                Qt.AspectRatioMode.KeepAspectRatio, 
-                Qt.TransformationMode.SmoothTransformation
+                label.size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
             )
             label.setPixmap(scaled)
         else:
@@ -123,8 +127,8 @@ class ProblemFragment(Fragment):
             pixmap.loadFromData(data)
             scaled = pixmap.scaled(
                 label.size(),
-                Qt.AspectRatioMode.KeepAspectRatio, 
-                Qt.TransformationMode.SmoothTransformation
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
             )
             label.setPixmap(scaled)
         else:

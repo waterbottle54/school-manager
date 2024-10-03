@@ -90,14 +90,17 @@ class MissViewModel(QObject):
     def on_start(self, arguments: dict):
         self.student = arguments["student"]
         self._update_miss_list()
+        self._reset_miss_index(True)
 
     def on_result(self, data: dict):
         if (data is not None) and (self.student is not None):
             problem: Problem = data["problem"]
             miss = Miss(self.student.id, problem.id, ProblemHeader.from_problem(problem))
-            print(str(miss.to_record()))
             self.miss_repository.insert(miss)
-        self._update_miss_list()
+            self._update_miss_list()
+            self._select_miss_index(miss)
+        else:
+            self._update_miss_list()
 
     def on_miss_selected(self, row: int, column: int):
         self.current_miss_index.set_value(row)

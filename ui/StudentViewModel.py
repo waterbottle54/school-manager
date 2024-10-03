@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from common.LiveData import *
-from data.common.ListDictRepository import *
+from data.common.DictOfListRepository import *
 from data.common.ListRepository import *
 from data.ProblemHeader import *
 from data.ProblemRepository import *

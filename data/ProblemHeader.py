@@ -2,10 +2,6 @@ from data.Problem import *
 
 
 class ProblemHeader:
-    grade: int
-    chapter: str
-    book: str
-    title: str
 
     def __init__(self, grade: int, chapter: str, book: str, title: str):
         self.grade = grade
@@ -14,8 +10,6 @@ class ProblemHeader:
         self.title = title
 
     def matches(self, problem: Problem) -> bool:
-        if problem is None:
-            return False
         return (
             self.grade == problem.grade
             and self.chapter == problem.chapter
@@ -25,4 +19,6 @@ class ProblemHeader:
 
     @staticmethod
     def from_problem(problem: Problem):
-        return ProblemHeader(problem.grade, problem.chapter, problem.book, problem.title)
+        return ProblemHeader(
+            problem.grade, problem.chapter, problem.book, problem.title
+        )

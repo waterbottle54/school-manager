@@ -1,0 +1,147 @@
+===============================================================================
+EXTENSION NAME : linecounter
+EXTENSION VERSION : 0.2.7
+-------------------------------------------------------------------------------
+count time : 2024-10-01 20:31:19
+count workspace : c:\Users\kamut\OneDrive\Desktop\brainscan
+total files : 122
+total code lines : 3277
+total comment lines : 32
+total blank lines : 782
+
+    statistics
+   |      extension|     total code|  total comment|    total blank|percent|
+   -------------------------------------------------------------------------
+   |            .py|           2697|             22|            728|     82|
+   |               |            145|              4|             38|    4.4|
+   |           .qss|             47|              0|             10|    1.4|
+   |          .json|              3|              0|              0|  0.092|
+   |            .ui|            310|              0|              0|    9.5|
+   |           .cfg|              2|              0|              0|  0.061|
+   |          .toml|              4|              0|              1|   0.12|
+   |           .bat|             35|              0|              5|    1.1|
+   |          .yaml|             34|              6|              0|    1.0|
+   -------------------------------------------------------------------------
+.trunk\.gitignore, code is 9, comment is 0, blank is 0.
+.trunk\configs\.isort.cfg, code is 2, comment is 0, blank is 0.
+.trunk\configs\ruff.toml, code is 4, comment is 0, blank is 1.
+.trunk\tools\black.bat, code is 8, comment is 0, blank is 1.
+.trunk\tools\checkov.bat, code is 8, comment is 0, blank is 1.
+.trunk\tools\isort.bat, code is 8, comment is 0, blank is 1.
+.trunk\tools\prettier.bat, code is 7, comment is 0, blank is 1.
+.trunk\tools\trufflehog.bat, code is 4, comment is 0, blank is 1.
+.trunk\tools\trunk, code is 136, comment is 4, blank is 38.
+.trunk\trunk.yaml, code is 34, comment is 6, blank is 0.
+App.py, code is 62, comment is 0, blank is 19.
+book.json, code is 1, comment is 0, blank is 0.
+chapter.json, code is 1, comment is 0, blank is 0.
+common\__pycache__\LiveData.cpython-312.pyc, it is a binary file.
+common\__pycache__\StringRes.cpython-312.pyc, it is a binary file.
+common\__pycache__\Utils.cpython-312.pyc, it is a binary file.
+common\LiveData.py, code is 67, comment is 1, blank is 15.
+common\StringRes.py, code is 8, comment is 0, blank is 2.
+common\Utils.py, code is 21, comment is 0, blank is 4.
+data\__pycache__\BookRepository.cpython-312.pyc, it is a binary file.
+data\__pycache__\ChapterRepository.cpython-312.pyc, it is a binary file.
+data\__pycache__\ImageRepository.cpython-312.pyc, it is a binary file.
+data\__pycache__\Miss.cpython-312.pyc, it is a binary file.
+data\__pycache__\MissRepository.cpython-312.pyc, it is a binary file.
+data\__pycache__\Problem.cpython-312.pyc, it is a binary file.
+data\__pycache__\ProblemHeader.cpython-312.pyc, it is a binary file.
+data\__pycache__\ProblemRepository.cpython-312.pyc, it is a binary file.
+data\__pycache__\SchoolRepository.cpython-312.pyc, it is a binary file.
+data\__pycache__\Student.cpython-312.pyc, it is a binary file.
+data\__pycache__\StudentRepository.cpython-312.pyc, it is a binary file.
+data\BookRepository.py, code is 4, comment is 0, blank is 3.
+data\ChapterRepository.py, code is 4, comment is 0, blank is 3.
+data\common\__pycache__\DatabaseConnection.cpython-312.pyc, it is a binary file.
+data\common\__pycache__\DatabaseRepository.cpython-312.pyc, it is a binary file.
+data\common\__pycache__\DictOfListRepository.cpython-312.pyc, it is a binary file.
+data\common\__pycache__\JsonStream.cpython-312.pyc, it is a binary file.
+data\common\__pycache__\ListDictRepository.cpython-312.pyc, it is a binary file.
+data\common\__pycache__\ListRepository.cpython-312.pyc, it is a binary file.
+data\common\DatabaseConnection.py, code is 12, comment is 2, blank is 4.
+data\common\DatabaseRepository.py, code is 91, comment is 2, blank is 19.
+data\common\DictOfListRepository.py, code is 42, comment is 0, blank is 11.
+data\common\JsonStream.py, code is 15, comment is 0, blank is 5.
+data\common\ListRepository.py, code is 19, comment is 0, blank is 6.
+data\ImageRepository.py, code is 30, comment is 0, blank is 8.
+data\Miss.py, code is 57, comment is 0, blank is 7.
+data\MissRepository.py, code is 46, comment is 0, blank is 10.
+data\Problem.py, code is 65, comment is 2, blank is 9.
+data\ProblemHeader.py, code is 23, comment is 0, blank is 5.
+data\ProblemRepository.py, code is 43, comment is 0, blank is 11.
+data\SchoolRepository.py, code is 4, comment is 0, blank is 2.
+data\Student.py, code is 22, comment is 0, blank is 3.
+data\StudentRepository.py, code is 23, comment is 0, blank is 8.
+db_app, it is a binary file.
+fonts\hakyo_B.ttf, it is a binary file.
+fonts\hakyo_R.ttf, it is a binary file.
+forms\Miss.ui, code is 310, comment is 0, blank is 0.
+images\back.png, it is a binary file.
+images\cosmos.jpg, it is a binary file.
+images\db.png, it is a binary file.
+images\document.png, it is a binary file.
+images\problem.png, it is a binary file.
+images\student.jpg, it is a binary file.
+images\student.png, it is a binary file.
+images_problem\grade8\별의성질\오투-8(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-11(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-2(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-20(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-3(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-33(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-33(sub).png, it is a binary file.
+images_problem\grade8\세포분열\오투-4(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-44(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-5(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-55(main).png, it is a binary file.
+images_problem\grade8\세포분열\오투-7(main).png, it is a binary file.
+images_problem\grade8\세포분열\체크체크-7(main).png, it is a binary file.
+images_problem\grade8\역학적에너지\오투-11(main).png, it is a binary file.
+school.json, code is 1, comment is 0, blank is 0.
+ui\__pycache__\AddProblemFragment.cpython-312.pyc, it is a binary file.
+ui\__pycache__\AddProblemViewModel.cpython-312.pyc, it is a binary file.
+ui\__pycache__\AddStudentDialog.cpython-312.pyc, it is a binary file.
+ui\__pycache__\AdminFragment.cpython-312.pyc, it is a binary file.
+ui\__pycache__\AdminViewModel.cpython-312.pyc, it is a binary file.
+ui\__pycache__\DataFragment.cpython-312.pyc, it is a binary file.
+ui\__pycache__\DataViewModel.cpython-312.pyc, it is a binary file.
+ui\__pycache__\HomeFragment.cpython-312.pyc, it is a binary file.
+ui\__pycache__\HomeViewModel.cpython-312.pyc, it is a binary file.
+ui\__pycache__\MissFragment.cpython-312.pyc, it is a binary file.
+ui\__pycache__\MissViewModel.cpython-312.pyc, it is a binary file.
+ui\__pycache__\ProblemFragment.cpython-312.pyc, it is a binary file.
+ui\__pycache__\ProblemViewModel.cpython-312.pyc, it is a binary file.
+ui\__pycache__\PromptProblemHeaderDialog.cpython-312.pyc, it is a binary file.
+ui\__pycache__\PromptProblemHeaderViewModel.cpython-312.pyc, it is a binary file.
+ui\__pycache__\StudentFragment.cpython-312.pyc, it is a binary file.
+ui\__pycache__\StudentViewModel.cpython-312.pyc, it is a binary file.
+ui\AddProblemFragment.py, code is 209, comment is 4, blank is 50.
+ui\AddProblemViewModel.py, code is 137, comment is 0, blank is 41.
+ui\AdminFragment.py, code is 51, comment is 0, blank is 16.
+ui\AdminViewModel.py, code is 24, comment is 0, blank is 12.
+ui\common\Fragment.py, code is 21, comment is 0, blank is 8.
+ui\common\Navigation.py, code is 71, comment is 0, blank is 26.
+ui\common\NonClickableCheckBox.py, code is 4, comment is 2, blank is 2.
+ui\common\Test.py, code is 7, comment is 0, blank is 5.
+ui\common\Toolbar.py, code is 16, comment is 0, blank is 6.
+ui\common\UiUtils.py, code is 6, comment is 0, blank is 2.
+ui\DataFragment.py, code is 183, comment is 0, blank is 49.
+ui\DataViewModel.py, code is 143, comment is 0, blank is 42.
+ui\dialogs\__pycache__\AddStudentDialog.cpython-312.pyc, it is a binary file.
+ui\dialogs\__pycache__\PromptProblemHeaderDialog.cpython-312.pyc, it is a binary file.
+ui\dialogs\__pycache__\PromptProblemHeaderViewModel.cpython-312.pyc, it is a binary file.
+ui\dialogs\AddStudentDialog.py, code is 95, comment is 0, blank is 27.
+ui\dialogs\PromptProblemHeaderDialog.py, code is 83, comment is 0, blank is 24.
+ui\dialogs\PromptProblemHeaderViewModel.py, code is 68, comment is 0, blank is 24.
+ui\HomeFragment.py, code is 43, comment is 0, blank is 16.
+ui\HomeViewModel.py, code is 13, comment is 0, blank is 7.
+ui\MissFragment.py, code is 110, comment is 1, blank is 23.
+ui\MissViewModel.py, code is 128, comment is 0, blank is 30.
+ui\ProblemFragment.py, code is 229, comment is 6, blank is 55.
+ui\ProblemViewModel.py, code is 198, comment is 1, blank is 45.
+ui\StudentFragment.py, code is 132, comment is 1, blank is 38.
+ui\StudentViewModel.py, code is 68, comment is 0, blank is 26.
+update_style.qss, code is 47, comment is 0, blank is 10.
+===============================================================================
