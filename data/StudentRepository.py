@@ -3,7 +3,7 @@ from data.common.DatabaseRepository import *
 from data.Student import *
 
 
-class StudentRepository(DatabaseRepository):
+class StudentRepository(DatabaseRepository["Student"]):
 
     def __init__(self):
         super().__init__("db_app", "student", "s_id", 1)

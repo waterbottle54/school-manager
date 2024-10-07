@@ -20,3 +20,12 @@ class Student(DataObject["Student"]):
             "school": self.school,
             "created": self.created,
         }
+
+    @staticmethod
+    def from_record(record: list[object]) -> "Student":
+        id = DataObject.cast(record[0], int)
+        name = DataObject.cast(record[1], str)
+        grade = DataObject.cast(record[2], int)
+        school = DataObject.cast(record[3], str)
+        created = DataObject.cast(record[4], int)
+        return Student(name, grade, school, id, created)

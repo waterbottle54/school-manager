@@ -10,15 +10,10 @@ from ui.ProblemFragment import *
 
 class AdminFragment(Fragment):
 
-    view_model: AdminViewModel
-
     def __init__(self, title):
         super().__init__(title)
-
         self.view_model = AdminViewModel()
-
         self.setup_ui()
-
         self.view_model.event.connect(self.on_event)
 
     def on_event(self, event):

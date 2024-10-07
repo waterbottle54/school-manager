@@ -9,6 +9,7 @@ from data.ImageRepository import *
 from data.Problem import *
 from data.ProblemHeader import *
 from data.ProblemRepository import *
+from data.common.LiveList import LiveList, MutableLiveList
 
 
 class ProblemViewModel(QObject):
@@ -17,140 +18,84 @@ class ProblemViewModel(QObject):
         pass
 
     class PromptProblemHeader(Event):
-        grade: int
-        chapter: str
-        book: str
-
         def __init__(self, grade: int, chapter: str, book: str):
             self.grade = grade
             self.chapter = chapter
             self.book = book
 
     class ConfirmDeleteProblem(Event):
-        problem: Problem
-
         def __init__(self, problem: Problem):
             self.problem = problem
 
     class NavigateToAddProblem(Event):
-        problem_header: ProblemHeader
-
         def __init__(self, header: ProblemHeader) -> None:
             super().__init__()
             self.problem_header = header
 
     class ShowGeneralMessage(Event):
-        message: str
-
         def __init__(self, message: str):
             self.message = message
 
     event: pyqtSignal = pyqtSignal(Event)
 
-    book_repository: BookRepository
-    chapter_repository: ChapterRepository
-    problem_repository: ProblemRepository
-    image_repository: ImageRepository
-
-    # TODO: change lists to MutableList so that data is updated whenever it's edited.
-    book_list: list[str]
-    current_book_index: MutableLiveData[int]
-    current_book: LiveData[str | None]
-
-    grade_list: list[int]
-    current_grade_index: MutableLiveData[int]
-    current_grade: LiveData[int | None]
-
-    chapter_list: LiveData[list[str]]
-    current_chapter_index: MutableLiveData[int]
-    current_chapter: LiveData[str | None]
-
-    problem_list: LiveData[list[Problem]]
-    current_problem_index: MutableLiveData[int]
-    current_problem: LiveData[Problem | None]
-    can_delete_problem: LiveData[bool]
-    can_modify_problem: LiveData[bool]
-
-    image_main: LiveData[bytes | None]
-    image_sub: LiveData[bytes | None]
-
-    range_num_choice: range
-
     def __init__(self):
         super().__init__()
-        self.book_repository = BookRepository()
-        self.chapter_repository = ChapterRepository()
-        self.problem_repository = ProblemRepository()
-        self.image_repository = ImageRepository()
 
-        self.book_list = self.book_repository.get_list()
-        self.current_book_index = MutableLiveData(0)
-        self.current_book = map(
-            self.current_book_index, lambda i: self.book_list[i] if i != -1 else None
+        # Member variables declaration
+        self._book_repository = BookRepository()
+        self._chapter_repository = ChapterRepository()
+        self._problem_repository = ProblemRepository()
+        self._image_repository = ImageRepository()
+
+        self._book_list: LiveList[str]
+        self._grade_list: MutableLiveList[int]
+        self._chapter_list: LiveList[str]
+        self._problem_list: LiveList[Problem]
+
+        self.image_main: LiveData[bytes | None]
+        self.image_sub: LiveData[bytes | None]
+
+        self.can_delete_problem: LiveData[bool]
+        self.can_modify_problem: LiveData[bool]
+        self.range_num_choice = range(4, 8)
+        # End of member variables declaration
+
+        self._book_list = LiveList(self._book_repository.get_list_livedata())
+        self._grade_list = MutableLiveList([i for i in range(6, 12)])
+
+        chapter_list_livedata = map2(
+            self._chapter_repository.get_dict_livedata(),
+            self._grade_list.index_livedata(),
+            lambda dict, grade: dict[grade] if grade in dict else [],
         )
+        self._chapter_list = LiveList(chapter_list_livedata)
 
-        self.grade_list = [i for i in range(6, 12)]
-
-        self.current_grade_index = MutableLiveData(2)
-        self.current_grade = map(
-            self.current_grade_index, lambda i: self.grade_list[i] if i != -1 else None
-        )
-
-        self.chapter_list = map(
-            self.current_grade,
-            lambda grade: (
-                self.chapter_repository.get_list_by_key(grade)
-                if grade is not None
-                else []
-            ),
-        )
-
-        self.current_chapter_index = MutableLiveData(-1)
-        self.current_chapter = map2(
-            self.chapter_list,
-            self.current_chapter_index,
-            lambda chapters, i: chapters[i] if i > -1 and i < len(chapters) else None,
-        )
-
-        self.problem_list = map3(
-            self.current_book,
-            self.current_grade,
-            self.current_chapter,
+        problem_list_livedata = map3(
+            self._book_list.selected_livedata(),
+            self._grade_list.selected_livedata(),
+            self._chapter_list.selected_livedata(),
             lambda book, grade, chapter: (
                 []
                 if (book is None) or (grade is None) or (chapter is None)
-                else self.problem_repository.query(book, grade, chapter)
+                else self._problem_repository.query(book, grade, chapter)
             ),
         )
-
-        self.current_problem_index = MutableLiveData(-1)
-        self.current_problem = map2(
-            self.problem_list,
-            self.current_problem_index,
-            lambda problems, i: problems[i] if i > -1 and i < len(problems) else None,
-        )
-        self.can_delete_problem = map(
-            self.current_problem, lambda problem: problem is not None
-        )
-        self.can_modify_problem = map(
-            self.current_problem, lambda problem: problem is not None
-        )
+        self._problem_list = LiveList(problem_list_livedata)
 
         self.image_main = map(
-            self.current_problem,
+            self._problem_list.selected_livedata(),
             lambda problem: (
-                self.image_repository.load_problem_image(
+                self._image_repository.load_problem_image(
                     ProblemHeader.from_problem(problem), True
                 )
                 if problem is not None
                 else None
             ),
         )
-
         self.image_sub = map(
-            self.current_problem,
+            self._problem_list.selected_livedata(),
             lambda problem: (
-                self.image_repository.load_problem_image(
+                self._image_repository.load_problem_image(
                     ProblemHeader.from_problem(problem), False
                 )
                 if problem is not None
@@ -158,42 +103,46 @@ class ProblemViewModel(QObject):
             ),
         )
 
-        self.range_num_choice = range(3, 9)
+        self.can_delete_problem = map(
+            self._problem_list.selected_livedata(), lambda problem: problem is not None
+        )
+        self.can_modify_problem = map(
+            self._problem_list.selected_livedata(), lambda problem: problem is not None
+        )
+
+    def on_start(self):
+        self._book_repository.update_livedata()
+        self._chapter_repository.update_livedata()
 
     def on_restart(self, problem: Problem):
-        self._update_problem_list()
-        self._select_problem_index(problem)
-
-    def on_resume(self):
-        if self.current_problem.value is None:
-            self._reset_problem_index(True)
+        self._problem_list.select(problem)
 
     def on_problem_click(self, row, column):
-        self.current_problem_index.set_value(row)
+        self._problem_list.select_at(row)
 
     def on_book_change(self, index):
-        self.current_book_index.set_value(index)
-        self._reset_problem_index(True)
+        self._book_list.select_at(index)
+        self._problem_list.select_at(0)
 
     def on_grade_change(self, index):
-        self.current_grade_index.set_value(index)
-        self._reset_problem_index(True)
+        self._grade_list.select_at(index)
+        self._problem_list.select_at(0)
 
     def on_chapter_change(self, index):
-        self.current_chapter_index.set_value(index)
-        self._reset_problem_index(True)
+        self._chapter_list.select_at(index)
+        self._problem_list.select_at(0)
 
     def on_add_problem_click(self):
-        grade = self.current_grade.value
-        chapter = self.current_chapter.value
-        book = self.current_book.value
+        grade = self._grade_list.selected_value()
+        chapter = self._chapter_list.selected_value()
+        book = self._book_list.selected_value()
         if (grade is not None) and (chapter is not None) and (book is not None):
             self.event.emit(ProblemViewModel.PromptProblemHeader(grade, chapter, book))
 
-    def on_problem_header_result(self, problem_header: ProblemHeader):
+    def on_problem_header_result(self, problem_header: ProblemHeader | None):
         if problem_header is None:
             return
-        existing = self.problem_repository.query_by_header(problem_header)
+        existing = self._problem_repository.query_by_header(problem_header)
         if len(existing) == 0:
             self.event.emit(ProblemViewModel.NavigateToAddProblem(problem_header))
         else:
@@ -202,43 +151,45 @@ class ProblemViewModel(QObject):
             )
 
     def on_delete_problem_click(self):
-        if self.current_problem.value is not None:
-            self.event.emit(
-                ProblemViewModel.ConfirmDeleteProblem(self.current_problem.value)
-            )
+        problem = self._problem_list.selected_value()
+        if problem is not None:
+            self.event.emit(ProblemViewModel.ConfirmDeleteProblem(problem))
 
-    def on_delete_probem_confirmed(self, problem: Problem):
-        self.problem_repository.delete(problem.id)
-        self._update_problem_list()
-        if self.current_problem.value is None:
-            self._reset_problem_index(False)
+    def on_delete_problem_confirmed(self, problem: Problem):
+        self._problem_list.set_default_index_on_update(
+            True, lambda list, i_end, i: i if i < i_end else i_end
+        )
+        self._problem_repository.delete(problem.id)
 
     def on_modify_problem_click(self):
-        problem = self.current_problem.value
+        problem = self._problem_list.selected_value()
         if problem is not None:
             header = ProblemHeader.from_problem(problem)
             self.event.emit(ProblemViewModel.NavigateToAddProblem(header))
 
-    def _update_problem_list(self):
-        self.current_chapter_index.publish()
+    def grade_list(self) -> LiveData[list[int]]:
+        return self._grade_list.list_livedata()
 
-    def _select_problem_index(self, problem: Problem):
-        p_list = self.problem_list.value
-        if len(p_list) == 0:
-            self.current_problem_index.set_value(-1)
-            return
-        try:
-            index = p_list.index(problem)
-            self.current_problem_index.set_value(index)
-        except ValueError:
-            self.current_problem_index.set_value(-1)
+    def grade_index(self) -> LiveData[int]:
+        return self._grade_list.index_livedata()
 
-    def _reset_problem_index(self, begin_or_end: bool):
-        p_list = self.problem_list.value
-        if len(p_list) == 0:
-            self.current_problem_index.set_value(-1)
-            return
-        if begin_or_end:
-            self.current_problem_index.set_value(0)
-        else:
-            self.current_problem_index.set_value(len(p_list) - 1)
+    def book_list(self) -> LiveData[list[str]]:
+        return self._book_list.list_livedata()
+
+    def book_index(self) -> LiveData[int]:
+        return self._book_list.index_livedata()
+
+    def chapter_list(self) -> LiveData[list[str]]:
+        return self._chapter_list.list_livedata()
+
+    def chapter_index(self) -> LiveData[int]:
+        return self._chapter_list.index_livedata()
+
+    def problem_list(self) -> LiveData[list[Problem]]:
+        return self._problem_list.list_livedata()
+
+    def problem_index(self) -> LiveData[int]:
+        return self._problem_list.index_livedata()
+
+    def problem_selected(self) -> LiveData[Problem | None]:
+        return self._problem_list.selected_livedata()

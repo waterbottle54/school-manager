@@ -9,15 +9,13 @@ from ui.HomeViewModel import *
 
 class HomeFragment(Fragment):
 
-    view_model: HomeViewModel
-
     def __init__(self, title):
         super().__init__(title)
 
+        self.name_edit = QLineEdit()
+
         self.view_model = HomeViewModel()
-
         self.setup_ui()
-
         self.view_model.event.connect(self.on_event)
 
     def on_resume(self):
@@ -40,6 +38,18 @@ class HomeFragment(Fragment):
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(layout)
 
+        label_name = self.create_name_label()
+        layout.addStretch()
+        layout.addWidget(label_name)
+        layout.addWidget(self.name_edit)
+        layout.addStretch()
+
+        layout.addSpacing(8)
+
+        self.name_edit.setFixedSize(190, 50)
+        self.name_edit.textChanged.connect(self.view_model.on_name_change)
+
+    def create_name_label(self) -> QLabel:
         label = QLabel("이름을 입력해주세요")
         label.setStyleSheet("color: white; font-size: 24px;")
         shadow = QGraphicsDropShadowEffect(label)
@@ -47,13 +57,4 @@ class HomeFragment(Fragment):
         shadow.setOffset(2, 2)
         shadow.setBlurRadius(5)
         label.setGraphicsEffect(shadow)
-        layout.addStretch()
-        layout.addWidget(label)
-
-        layout.addSpacing(8)
-
-        self.name_edit = QLineEdit()
-        self.name_edit.setFixedSize(190, 50)
-        self.name_edit.textChanged.connect(self.view_model.on_name_change)
-        layout.addWidget(self.name_edit)
-        layout.addStretch()
+        return label

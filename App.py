@@ -23,19 +23,19 @@ class MainWindow(QMainWindow):
         self.navigation: Navigation
         self.container = QWidget()
         self.toolbar = Toolbar()
+        self.central_widget = QWidget()
+        self.layout_top = QVBoxLayout()
 
         self.setWindowTitle("BrainScan")
         self.setGeometry(0, 0, 1280, 740)
         self.set_stylesheet()
 
-        central_widget = QWidget()
-        layout_top = QVBoxLayout()
-        central_widget.setLayout(layout_top)
-        self.setCentralWidget(central_widget)
+        self.layout_top.setContentsMargins(0, 0, 0, 0)
+        self.layout_top.addWidget(self.toolbar)
+        self.layout_top.addWidget(self.container)
 
-        layout_top.setContentsMargins(0, 0, 0, 0)
-        layout_top.addWidget(self.toolbar)
-        layout_top.addWidget(self.container)
+        self.central_widget.setLayout(self.layout_top)
+        self.setCentralWidget(self.central_widget)
 
         graph = {
             HomeFragment: HomeFragment("홈"),

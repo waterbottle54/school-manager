@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
 
 from common.StringRes import *
 from ui.AddProblemFragment import *
+from ui.common import UiUtils
 from ui.common.Fragment import *
 from ui.common.NonClickableCheckBox import *
 from ui.common.UiUtils import *
@@ -23,54 +24,48 @@ from ui.ProblemViewModel import *
 
 class ProblemFragment(Fragment):
 
-    view_model: ProblemViewModel
-
-    layout: QHBoxLayout
-
     def __init__(self, title):
         super().__init__(title)
 
         self.view_model = ProblemViewModel()
-
-        self.layout = QHBoxLayout()
-        self.setLayout(self.layout)
-
+        
+        self.layout_top = QHBoxLayout()
         self.layout_problem_list = self.setup_problem_list_layout()
-        self.layout.addLayout(self.layout_problem_list)
-
-        self.layout.addStretch(1)
-
         self.layout_problem_detail = self.setup_problem_detail_layout()
-        self.layout.addLayout(self.layout_problem_detail)
 
-        self.view_model.current_book_index.observe(self.combo_book.setCurrentIndex)
-        self.view_model.current_grade_index.observe(self.combo_grade.setCurrentIndex)
-        self.view_model.current_chapter_index.observe(
-            self.combo_chapter.setCurrentIndex
+        self.setLayout(self.layout_top)
+        self.layout_top.addLayout(self.layout_problem_list)
+        self.layout_top.addStretch(1)
+        self.layout_top.addLayout(self.layout_problem_detail)
+
+        self.view_model.grade_list().observe(self.update_grade_combo)
+        self.view_model.chapter_list().observe(self.update_chapter_combo)
+        self.view_model.problem_list().observe(self.update_problem_table)
+        self.view_model.problem_selected().observe(self.update_problem_detail)
+
+        self.view_model.book_index().observe(self.cb_book.setCurrentIndex)
+        self.view_model.grade_index().observe(self.cb_grade.setCurrentIndex)
+        self.view_model.chapter_index().observe(self.cb_chapter.setCurrentIndex)
+        self.view_model.problem_index().observe(self.tw_problem.selectRow)
+
+        self.view_model.image_main.observe(
+            lambda data: UiUtils.set_label_image(self.label_image_main, data)
         )
-        self.view_model.current_problem_index.observe(
-            lambda i: self.tw_problem.selectRow(i)
+        self.view_model.image_sub.observe(
+            lambda data: UiUtils.set_label_image(self.label_image_sub, data)
         )
-        self.view_model.chapter_list.observe(self.update_chapter_combo)
-        self.view_model.problem_list.observe(self.update_problem_table)
-        self.view_model.can_delete_problem.observe(
-            self.button_delete_problem.setEnabled
-        )
-        self.view_model.can_modify_problem.observe(
-            self.button_modify_problem.setEnabled
-        )
-        self.view_model.current_problem.observe(self.update_problem_detail)
-        self.view_model.image_main.observe(self.update_image_main)
-        self.view_model.image_sub.observe(self.update_image_sub)
+
+        self.view_model.can_delete_problem.observe(self.btn_delete_problem.setEnabled)
+        self.view_model.can_modify_problem.observe(self.btn_modify_problem.setEnabled)
 
         self.view_model.event.connect(self.on_event)
+
+    def on_start(self, arguments: dict[str, object] | None = None):
+        self.view_model.on_start()
 
     def on_restart(self, result: dict | None = None):
         if result is not None:
             self.view_model.on_restart(result["problem"])
-
-    def on_resume(self):
-        self.view_model.on_resume()
 
     def on_event(self, event: ProblemViewModel.Event):
         if isinstance(event, ProblemViewModel.NavigateToAddProblem):
@@ -93,10 +88,17 @@ class ProblemFragment(Fragment):
             mb.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
             mb.setDefaultButton(QMessageBox.Cancel)
             if mb.exec_() == QMessageBox.Ok:
-                self.view_model.on_delete_probem_confirmed(event.problem)
+                self.view_model.on_delete_problem_confirmed(event.problem)
 
-    def update_problem_detail(self, problem: Problem):
+    def update_grade_combo(self, g_list: list[int]):
+        items = [grade_name(g) for g in g_list]
+        self.cb_grade.addItems(items)
 
+    def update_chapter_combo(self, chapters):
+        self.cb_chapter.clear()
+        self.cb_chapter.addItems(chapters)
+
+    def update_problem_detail(self, problem: Problem | None):
         if problem is not None:
             self.stacked_widget.setCurrentIndex(0 if len(problem.ans_mcq) > 0 else 1)
             # mcq
@@ -105,41 +107,6 @@ class ProblemFragment(Fragment):
                 button_choice.setChecked(i in problem.ans_mcq)
         else:
             self.stacked_widget.setCurrentIndex(2)
-
-    def update_image_main(self, data: bytes):
-        label = self.label_image_main
-        if data is not None:
-            pixmap = QPixmap()
-            pixmap.loadFromData(data)
-            scaled = pixmap.scaled(
-                label.size(),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation,
-            )
-            label.setPixmap(scaled)
-        else:
-            self.label_image_main.clear()
-
-    def update_image_sub(self, data: bytes):
-        label = self.label_image_sub
-        if data is not None:
-            pixmap = QPixmap()
-            pixmap.loadFromData(data)
-            scaled = pixmap.scaled(
-                label.size(),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation,
-            )
-            label.setPixmap(scaled)
-        else:
-            self.label_image_sub.clear()
-
-    def update_chapter_combo(self, chapters):
-        self.combo_chapter.clear()
-        self.combo_chapter.addItems(chapters)
-
-    def update_chapter_combo_selection(self, i):
-        self.combo_chapter.setCurrentIndex(i)
 
     def update_problem_table(self, problem_list):
         self.tw_problem.setRowCount(len(problem_list))
@@ -164,44 +131,34 @@ class ProblemFragment(Fragment):
         layout.addLayout(self.layout_buttons)
 
         # combo boxes
-        self.combo_book = QComboBox()
-        self.layout_combos.addWidget(self.combo_book)
-        self.combo_book.addItems(self.view_model.book_list)
-        self.combo_book.currentIndexChanged.connect(self.view_model.on_book_change)
+        self.cb_book = QComboBox()
+        self.layout_combos.addWidget(self.cb_book)
+        self.cb_book.currentIndexChanged.connect(self.view_model.on_book_change)
 
-        self.combo_grade = QComboBox()
-        self.layout_combos.addWidget(self.combo_grade)
+        self.cb_grade = QComboBox()
+        self.layout_combos.addWidget(self.cb_grade)
+        self.cb_grade.currentIndexChanged.connect(self.view_model.on_grade_change)
 
-        items_grade = [grade_name(i) for i in self.view_model.grade_list]
-        self.combo_grade.addItems(items_grade)
-        self.combo_grade.currentIndexChanged.connect(self.view_model.on_grade_change)
-
-        self.combo_chapter = QComboBox()
-        self.layout_combos.addWidget(self.combo_chapter)
-        self.combo_chapter.currentIndexChanged.connect(
-            self.view_model.on_chapter_change
-        )
+        self.cb_chapter = QComboBox()
+        self.layout_combos.addWidget(self.cb_chapter)
+        self.cb_chapter.currentIndexChanged.connect(self.view_model.on_chapter_change)
 
         # buttons
         self.button_add_problem = QPushButton("문제 등록")
         self.button_add_problem.setObjectName("modify")
         self.button_add_problem.clicked.connect(self.view_model.on_add_problem_click)
 
-        self.button_modify_problem = QPushButton("수정")
-        self.button_modify_problem.setObjectName("modify")
-        self.button_modify_problem.clicked.connect(
-            self.view_model.on_modify_problem_click
-        )
+        self.btn_modify_problem = QPushButton("수정")
+        self.btn_modify_problem.setObjectName("modify")
+        self.btn_modify_problem.clicked.connect(self.view_model.on_modify_problem_click)
 
-        self.button_delete_problem = QPushButton("삭제")
-        self.button_delete_problem.setObjectName("modify")
-        self.button_delete_problem.clicked.connect(
-            self.view_model.on_delete_problem_click
-        )
+        self.btn_delete_problem = QPushButton("삭제")
+        self.btn_delete_problem.setObjectName("modify")
+        self.btn_delete_problem.clicked.connect(self.view_model.on_delete_problem_click)
 
         self.layout_buttons.addWidget(self.button_add_problem)
-        self.layout_buttons.addWidget(self.button_modify_problem)
-        self.layout_buttons.addWidget(self.button_delete_problem)
+        self.layout_buttons.addWidget(self.btn_modify_problem)
+        self.layout_buttons.addWidget(self.btn_delete_problem)
 
         return layout
 

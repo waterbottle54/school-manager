@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 from common.LiveData import *
 
+
 class AdminViewModel(QObject):
 
     class Event:
@@ -25,10 +26,10 @@ class AdminViewModel(QObject):
 
     def on_back_click(self):
         self.event.emit(AdminViewModel.NavigateBack())
-        
+
     def on_data_click(self):
         self.event.emit(AdminViewModel.NavigateToDataFragment())
-            
+
     def on_student_click(self):
         self.event.emit(AdminViewModel.NavigateToStudentFragment())
 

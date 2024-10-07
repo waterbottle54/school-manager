@@ -24,24 +24,22 @@ from ui.common.UiUtils import *
 
 class AddProblemFragment(Fragment):
 
-    view_model: AddProblemViewModel
-    layout: QHBoxLayout
-
     def __init__(self, title):
         super().__init__(title)
 
         self.view_model = AddProblemViewModel()
-
-        self.layout = QHBoxLayout()
-        self.setLayout(self.layout)
+        self.layout_top = QHBoxLayout()
+        self.layout_picture: QHBoxLayout
+        self.layout_form: QVBoxLayout
 
         self.layout_picture = self.setup_picture_layout()
-        self.layout.addLayout(self.layout_picture, stretch=3)
-
-        self.layout.addSpacing(32)
-
         self.layout_form = self.setup_form_layout()
-        self.layout.addLayout(self.layout_form, stretch=2)
+
+        self.setLayout(self.layout_top)
+
+        self.layout_top.addLayout(self.layout_picture, stretch=3)
+        self.layout_top.addSpacing(32)
+        self.layout_top.addLayout(self.layout_form, stretch=2)
 
         self.view_model.problem_type.observe(self.update_problem_type)
         self.view_model.current_num_choices.observe(self.update_num_choice)
@@ -54,12 +52,9 @@ class AddProblemFragment(Fragment):
         )
         self.view_model.is_input_valid.observe(self.button_submit.setEnabled)
 
-        self.view_model.event.connect(self.on_event)
+        self.view_model._event.connect(self.on_event)
 
-    def on_start(self, arguments: dict = None):
-        super().on_start(arguments)
-        problem_header = arguments["problem_header"]
-        self.update_title(problem_header)
+    def on_start(self, arguments: dict[str, object] | None = None):
         self.view_model.on_start(arguments)
 
     def on_event(self, event):
@@ -75,45 +70,36 @@ class AddProblemFragment(Fragment):
             mb.setText("이미지를 삭제하시겠습니까?")
             mb.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
             if mb.exec_() == QMessageBox.Ok:
-                self.view_model.on_delete_image_confirm(event.is_main)
+                self.view_model.on_delete_image_confirmed(event.is_main)
 
     def on_choice_toggled(self, _button, _checked):
         list_chekced = []
         for i, check_button in enumerate(self.list_button_choice):
             if check_button.isChecked():
                 list_chekced.append(i)
-        self.view_model.on_choice_change(list_chekced)
-
-    def select_image(self, is_main: bool):
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open Image", "", "Image Files (*.png *.jpg *.bmp)"
-        )
-        if path:
-            with open(path, "rb") as file:
-                self.view_model.on_image_result(file.read(), is_main)
+        self.view_model.on_choice_changed(list_chekced)
 
     def update_title(self, header: ProblemHeader):
-        if header is not None:
-            self.title = problem_title(header)
-        else:
-            self.title = "-"
+        self.title = problem_title(header) if (header is not None) else "-"
 
-    def update_problem_type(self, type):
-        self.bgroup_type.button(type).setChecked(True)
-        self.stacked_widget.setCurrentIndex(type)
+    def update_problem_type(self, _type):
+        button_type = self.bgroup_type.button(_type)
+        if button_type is not None:
+            button_type.setChecked(True)
+        self.stacked_widget.setCurrentIndex(_type)
 
-    def update_num_choice(self, num_choice):
+    def update_num_choice(self, num_choice: int):
         index = num_choice - self.view_model.range_num_choice.start
         self.combo_num_choice.setCurrentIndex(index)
         for i, button_choice in enumerate(self.list_button_choice):
             button_choice.setVisible(i < num_choice)
             button_choice.setChecked(False)
 
-    def update_choices(self, answer_list: list):
+    def update_choices(self, answer_list: list[int]):
         for i, button_choice in enumerate(self.list_button_choice):
             button_choice.setChecked(i in answer_list)
 
-    def update_image(self, data: bytes, is_main: bool):
+    def update_image(self, data: bytes | None, is_main: bool):
         label = self.label_main_image if is_main else self.label_sub_image
         button = (
             self.button_delete_main_image if is_main else self.button_delete_sub_image
@@ -123,13 +109,23 @@ class AddProblemFragment(Fragment):
             pixmap = QPixmap()
             pixmap.loadFromData(data)
             scaled = pixmap.scaled(
-                label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+                label.size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
             )
             label.setPixmap(scaled)
         else:
             label.clear()
 
-    def setup_picture_layout(self):
+    def select_image(self, is_main: bool):
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Open Image", "", "Image Files (*.png *.jpg *.bmp)"
+        )
+        if path:
+            with open(path, "rb") as file:
+                self.view_model.on_image_result(file.read(), is_main)
+
+    def setup_picture_layout(self) -> QHBoxLayout:
         self.layout_picture = QHBoxLayout()
 
         self.layout_main_image = QVBoxLayout()
@@ -178,7 +174,7 @@ class AddProblemFragment(Fragment):
 
         return self.layout_picture
 
-    def setup_form_layout(self):
+    def setup_form_layout(self) -> QVBoxLayout:
         self.layout_form = QVBoxLayout()
 
         # radios for problem type
@@ -252,12 +248,10 @@ class AddProblemFragment(Fragment):
             self.bgroup_choice.addButton(button_choice, i)
 
         self.bgroup_choice.buttonToggled.connect(self.on_choice_toggled)
-
         return self.page_mcq
 
-    def create_saq_page(self):
+    def create_saq_page(self) -> QWidget:
         self.page_saq = QWidget()
         self.layout_saq = QVBoxLayout()
         self.page_saq.setLayout(self.layout_saq)
-
         return self.page_saq

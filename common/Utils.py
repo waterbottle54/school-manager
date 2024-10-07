@@ -7,7 +7,7 @@ class SORT(Enum):
     HIGH = 2
 
 
-def get_school_sort(title: str) -> SORT:
+def get_school_sort(title: str) -> SORT | None:
     if len(title) <= 1:
         return None
     if title[-1] == "초":

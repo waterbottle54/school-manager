@@ -4,7 +4,7 @@ from data.Problem import *
 from data.ProblemHeader import *
 
 
-class ProblemRepository(DatabaseRepository):
+class ProblemRepository(DatabaseRepository["Problem"]):
 
     def __init__(self):
         super().__init__("db_app", "problem", "p_id", 1)
@@ -26,19 +26,8 @@ class ProblemRepository(DatabaseRepository):
             """,
         )
 
-    def to_object(self, row) -> Problem:
-        id = row[0]
-        grade = row[1]
-        chapter = row[2]
-        book = row[3]
-        title = row[4]
-        num_choice = row[5]
-        ans_mcq = row[6]
-        ans_saq = row[7]
-        created = row[8]
-        return Problem.from_record(
-            id, grade, chapter, book, title, num_choice, ans_mcq, ans_saq, created
-        )
+    def to_object(self, record: list[object]) -> Problem:
+        return Problem.from_record(record)
 
     def query_all(self) -> list:
         return super().query(f"SELECT * FROM {self.table_name} ORDER BY created DESC")

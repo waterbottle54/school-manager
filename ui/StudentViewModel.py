@@ -18,42 +18,30 @@ class StudentViewModel(QObject):
         pass
 
     class ConfirmDeleteStudent(Event):
-        student: Student
-
         def __init__(self, student: Student):
             self.student = student
 
     class NavigateToMissScreen(Event):
-        student: Student
-
         def __init__(self, student):
             self.student = student
 
     event: pyqtSignal = pyqtSignal(Event)
-
-    student_index: MutableLiveData
-    can_delete_student: LiveData
-
-    student_list: MutableLiveData
-    current_student: LiveData
-    student_repository: StudentRepository
-    problem_repository: ProblemRepository
 
     def __init__(self):
         super().__init__()
 
         self.student_repository = StudentRepository()
         self.problem_repository = ProblemRepository()
-
         self.student_list = MutableLiveData([])
         self.student_index = MutableLiveData(-1)
+        self.current_student: LiveData[Student | None]
+        self.can_delete_student: LiveData[bool]
 
         self.current_student = map2(
             self.student_list,
             self.student_index,
             lambda list, i: list[i] if i >= 0 and i < len(list) else None,
         )
-
         self.can_delete_student = map(
             self.current_student, lambda student: student is not None
         )
@@ -62,10 +50,7 @@ class StudentViewModel(QObject):
         self.update_student_list()
         self.student_index.set_value(0)
 
-    def on_add_problem_result(self, problem: Problem):
-        print(str(problem.to_record()))
-
-    def on_student_click(self, row, column):
+    def on_student_click(self, row: int, col: int):
         self.student_index.set_value(row)
 
     def on_add_student_click(self):

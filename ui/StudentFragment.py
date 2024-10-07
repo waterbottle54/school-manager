@@ -23,25 +23,19 @@ from ui.StudentViewModel import *
 
 class StudentFragment(Fragment):
 
-    view_model: StudentViewModel
-
-    layout: QHBoxLayout
-
     def __init__(self, title):
         super().__init__(title)
 
         self.view_model = StudentViewModel()
-
-        self.layout = QHBoxLayout()
-        self.setLayout(self.layout)
-
+        self.layout_top = QHBoxLayout()
         self.left_layout = QVBoxLayout()
-        self.layout.addLayout(self.left_layout)
-
-        self.layout.addSpacing(16)
-
         self.right_layout = QVBoxLayout()
-        self.layout.addLayout(self.right_layout)
+
+        self.setLayout(self.layout_top)
+
+        self.layout_top.addLayout(self.left_layout)
+        self.layout_top.addSpacing(16)
+        self.layout_top.addLayout(self.right_layout)
 
         self.setup_student_table_sector()
         self.setup_student_detail_sector()
@@ -55,7 +49,7 @@ class StudentFragment(Fragment):
 
         self.view_model.event.connect(self.on_event)
 
-    def on_start(self, arguments):
+    def on_start(self, arguments: dict[str, object]):
         self.view_model.on_start()
 
     def on_event(self, event: StudentViewModel.Event):
@@ -66,7 +60,7 @@ class StudentFragment(Fragment):
         elif isinstance(event, StudentViewModel.ConfirmDeleteStudent):
             self.confirm_delete_student(event.student)
 
-    def update_student_table(self, student_list):
+    def update_student_table(self, student_list: list[Student]):
         self.tw_student.setRowCount(len(student_list))
         for i, student in enumerate(student_list):
             student: Student
@@ -76,7 +70,7 @@ class StudentFragment(Fragment):
             self.tw_student.setItem(i, 1, self.table_item_center(student.name))
             self.tw_student.setItem(i, 2, self.table_item_center(student.school))
 
-    def update_student_detail(self, student: Student):
+    def update_student_detail(self, student: Student | None):
         if student is not None:
             text_detail = "◎  {:^6} | {:^6} | {:^12}".format(
                 student.name, grade_name(student.grade), student.school
@@ -92,8 +86,8 @@ class StudentFragment(Fragment):
         item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
         return item
 
-    def update_student_selection(self, row):
-        if row >= 0 and row < self.tw_student.rowCount():
+    def update_student_selection(self, row: int):
+        if (row >= 0) and (row < self.tw_student.rowCount()):
             self.tw_student.selectRow(row)
             self.tw_student.setFocus()
 
@@ -110,7 +104,7 @@ class StudentFragment(Fragment):
         self.tw_student.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tw_student.setSelectionMode(QTableWidget.SingleSelection)
         self.tw_student.setSelectionBehavior(QTableWidget.SelectRows)
-        vertical_header: QHeaderView = self.tw_student.verticalHeader()
+        vertical_header = self.tw_student.verticalHeader()
         if vertical_header is not None:
             vertical_header.setVisible(False)
         self.tw_student.setHorizontalHeaderLabels(["학년", "이름", "학교"])

@@ -89,7 +89,7 @@ class MissFragment(Fragment):
             table.selectRow(index)
             table.setFocus()
 
-    def _update_miss_detail(self, index: int):
+    def _update_miss_detail(self, miss: Miss | None):
         pass
 
     def _update_main_image(self, image_data: bytes | None):

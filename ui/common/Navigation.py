@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QVBoxLayout
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 from ui.common.Fragment import *
 from ui.common.Toolbar import *
@@ -19,13 +19,15 @@ class Navigation:
         self, container: QWidget, _graph: dict[type, Fragment], home: Fragment
     ):
         self.container = container
-        self.layout: QVBoxLayout
+        self.layout = QVBoxLayout()
+        self.container.setLayout(self.layout)
         self.graph = _graph
         self.home_fragment = _graph[home]
-        self.current_fragment: Fragment
+        self.current_fragment: Fragment | None = None
         self.back_stack = list[Fragment]()
         self.back_stack_change_listener: Callable[[Fragment], None] | None = None
         self.toolbar: Toolbar | None = None
+
         if Navigation._instance is None:
             Navigation._instance = self
 
@@ -36,10 +38,9 @@ class Navigation:
         self.toolbar = toolbar
         toolbar.get_back_button().clicked.connect(self.navigate_back)
 
-    def navigate(self, cls, arguments: dict | None = None):
+    def navigate(self, cls, arguments: dict[str, Any] | None = None):
         if cls not in self.graph:
             return
-
         if self.current_fragment is not None:
             self.back_stack.append(self.current_fragment)
             self.layout.removeWidget(self.current_fragment)
@@ -51,7 +52,9 @@ class Navigation:
         self.current_fragment.on_start(arguments)
         self.on_fragment_change()
 
-    def navigate_back(self, data_result: dict | None = None):
+    def navigate_back(self, data_result: dict[str, Any] | None = None):
+        if self.current_fragment is None:
+            return
         if len(self.back_stack) > 0:
             self.current_fragment.on_pause()
 
@@ -65,6 +68,9 @@ class Navigation:
             self.on_fragment_change()
 
     def on_fragment_change(self):
+        if self.current_fragment is None:
+            return
+
         self.current_fragment.on_resume()
 
         if self.back_stack_change_listener is not None:
@@ -73,7 +79,7 @@ class Navigation:
         self.update_toolbar()
 
     def update_toolbar(self):
-        if self.toolbar is None:
+        if (self.current_fragment is None) or (self.toolbar is None):
             return
 
         layout_toolbar = self.toolbar.get_top_layout()

@@ -2,5 +2,6 @@
   "python.REPL.enableREPLSmartSend": false,
   "python.autoComplete.extraPaths": [
     "$C:/Users/kamut/OneDrive/Desktop/brainscan/libs/"
-  ]
+  ],
+  "python.analysis.autoImportCompletions": true
 }

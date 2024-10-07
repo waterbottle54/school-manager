@@ -53,7 +53,7 @@ class DatabaseRepository[T](ABC):
     def to_object(self, record: list[object]) -> T:
         pass
 
-    def query(self, sql, args: tuple[object] = tuple()) -> list[T]:
+    def query(self, sql: str, args: tuple = tuple()) -> list[T]:
         result_list = list[T]()
         with DatabaseConnection(self.db_name) as db:
             db.cursor.execute(sql, args)

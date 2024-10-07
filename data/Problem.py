@@ -42,23 +42,22 @@ class Problem(DataObject["Problem"]):
         }
 
     @staticmethod
-    def from_record(
-        id: int,
-        grade: int,
-        chapter: str,
-        book: str,
-        title: str,
-        num_choice: int,
-        json_ans_mcq: str,
-        json_ans_saq: str,
-        created: int,
-    ):
+    def from_record(record: list[object]) -> "Problem":
+        id = DataObject.cast(record[0], int)
+        grade = DataObject.cast(record[1], int)
+        chapter = DataObject.cast(record[2], str)
+        book = DataObject.cast(record[3], str)
+        title = DataObject.cast(record[4], str)
+        num_choice = DataObject.cast(record[5], int)
+        json_ans_mcq = DataObject.cast(record[6], str)
+        json_ans_saq = DataObject.cast(record[7], str)
+        created = DataObject.cast(record[8], int)
+
         ans_mcq = json.loads(json_ans_mcq)
         ans_saq = Problem.and_saq_from_json(json_ans_saq)
-        problem = Problem(
+        return Problem(
             grade, chapter, book, title, num_choice, ans_mcq, ans_saq, id, created
         )
-        return problem
 
     @staticmethod
     def ans_saq_to_json(_ans_saq: dict[int, str]) -> str:

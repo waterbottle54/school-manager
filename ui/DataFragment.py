@@ -1,5 +1,6 @@
+from multiprocessing.connection import Connection
 import numpy as np
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtBoundSignal
 from PyQt5.QtWidgets import (
     QComboBox,
     QHBoxLayout,
@@ -11,6 +12,7 @@ from PyQt5.QtWidgets import (
 )
 
 from common.StringRes import *
+from ui.common import UiUtils
 from ui.common.Fragment import *
 from ui.common.Navigation import *
 from ui.DataViewModel import *
@@ -42,16 +44,20 @@ class DataFragment(Fragment):
 
         self.view_model.on_grade_change(0)
 
-        self.view_model.school_list.observe(self.update_school_lw)
-        self.view_model.book_list.observe(self.update_book_lw)
-        self.view_model.chapter_list.observe(self.update_chapter_lw)
+        self.view_model.school_list_live().observe(self.update_school_lw)
+        self.view_model.book_list_live().observe(self.update_book_lw)
+        self.view_model.chapter_list_live().observe(self.update_chapter_lw)
 
-        self.view_model.school_index.observe(lambda i: self.update_school_selection(i))
-        self.view_model.book_index.observe(lambda i: self.update_book_selection(i))
-        self.view_model.chapter_index.observe(
+        self.view_model.school_index_live().observe(
+            lambda i: QTimer.singleShot(10, lambda: self.update_school_selection(i))
+        )
+        self.view_model.book_index_live().observe(
+            lambda i: QTimer.singleShot(10, lambda: self.update_book_selection(i))
+        )
+        self.view_model.chapter_index_live().observe(
             lambda i: self.button_remove_chapter.setEnabled(i != -1)
         )
-        self.view_model.chapter_index.observe(
+        self.view_model.chapter_index_live().observe(
             lambda i: QTimer.singleShot(10, lambda: self.update_chapter_selection(i))
         )
         self.view_model.can_move_chapter_left.observe(
@@ -60,6 +66,7 @@ class DataFragment(Fragment):
         self.view_model.can_move_chapter_right.observe(
             lambda can: self.button_chapter_down.setEnabled(can)
         )
+        self.view_model.grade_live().observe(self.cb_grade.setCurrentIndex)
 
         self.view_model.event.connect(self.on_event)
 
@@ -86,23 +93,38 @@ class DataFragment(Fragment):
         self.view_model.on_delete_chapter_click()
 
     def update_school_lw(self, schools):
+        UiUtils.disconnect(self.lw_school.currentRowChanged)
+
         self.lw_school.clear()
         self.lw_school.addItems(schools)
 
+        self.lw_school.currentRowChanged.connect(self.view_model.on_school_click)
+
     def update_school_selection(self, index):
+        UiUtils.disconnect(self.lw_school.currentRowChanged)
+
         self.button_remove_school.setEnabled(index != -1)
 
         if index < 0 or index >= self.lw_school.count():
             self.lw_school.clearSelection()
             return
+
         self.lw_school.setCurrentRow(index)
         self.lw_school.setFocus()
 
+        self.lw_school.currentRowChanged.connect(self.view_model.on_school_click)
+
     def update_book_lw(self, books):
+        UiUtils.disconnect(self.lw_book.currentRowChanged)
+
         self.lw_book.clear()
         self.lw_book.addItems(books)
 
+        self.lw_book.currentRowChanged.connect(self.view_model.on_book_click)
+
     def update_book_selection(self, index):
+        UiUtils.disconnect(self.lw_book.currentRowChanged)
+
         self.button_remove_book.setEnabled(index != -1)
 
         if index < 0 or index >= self.lw_book.count():
@@ -111,16 +133,27 @@ class DataFragment(Fragment):
         self.lw_book.setCurrentRow(index)
         self.lw_book.setFocus()
 
+        self.lw_book.currentRowChanged.connect(self.view_model.on_book_click)
+
     def update_chapter_lw(self, chapters):
+        UiUtils.disconnect(self.lw_chapter.currentRowChanged)
+
         self.lw_chapter.clear()
         self.lw_chapter.addItems(chapters)
 
+        self.lw_chapter.currentRowChanged.connect(self.view_model.on_chapter_click)
+
     def update_chapter_selection(self, index):
+        UiUtils.disconnect(self.lw_chapter.currentRowChanged)
+
         if index < 0 or index >= self.lw_chapter.count():
             self.lw_chapter.clearSelection()
             return
+
         self.lw_chapter.setCurrentRow(index)
         self.lw_chapter.setFocus()
+
+        self.lw_chapter.currentRowChanged.connect(self.view_model.on_chapter_click)
 
     def prompt_school_name(self):
         school_name, ok = QInputDialog.getText(self, "학교 추가", "학교명")
@@ -193,9 +226,7 @@ class DataFragment(Fragment):
         self.layout_chapter.addWidget(self.cb_grade)
 
         self.lw_chapter = QListWidget()
-        self.lw_chapter.currentItemChanged.connect(
-            lambda: self.view_model.on_chapter_click(self.lw_chapter.currentRow())
-        )
+        self.lw_chapter.currentRowChanged.connect(self.view_model.on_chapter_click)
         self.layout_chapter.addWidget(self.lw_chapter)
 
         self.updown_button_layout = QHBoxLayout()

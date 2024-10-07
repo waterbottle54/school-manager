@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import typing
+from typing import cast
 
 
 class DataObject[T](ABC):
@@ -9,11 +9,11 @@ class DataObject[T](ABC):
 
     @staticmethod
     @abstractmethod
-    def from_record(record: list[T]): ...
+    def from_record(record: list[object]): ...
 
     @staticmethod
     def cast[_T](value: object, _type: type[_T]) -> _T:
-        if isinstance(value, _type):
-            return value
+        if type(value) is _type:
+            return cast(_T, value)
         else:
-            raise Exception(f"value of type {_type} is not of type {_type}")
+            raise Exception(f"value of type {type(value)} is not of type {_type}")

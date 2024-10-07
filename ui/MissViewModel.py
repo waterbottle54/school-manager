@@ -16,38 +16,18 @@ class MissViewModel(QObject):
         pass
 
     class PromptProblemHeader(Event):
-        student: Student
         def __init__(self, student: Student):
             self.student = student
 
     class NavigationToAddProblemScreen(Event):
-        problem_header: ProblemHeader
-
         def __init__(self, problem_header: ProblemHeader):
             self.problem_header = problem_header
 
     class ConfirmDeleteMiss(Event):
-        miss: Miss
         def __init__(self, miss: Miss):
             self.miss = miss
 
     event: pyqtSignal = pyqtSignal(Event)
-
-    miss_repository: MissRepository
-    problem_repository: ProblemRepository
-    image_repository: ImageRepository
-
-    student: Student|None
-
-    miss_list: MutableLiveData[list[Miss]]
-    current_miss_index: MutableLiveData[int]
-    current_miss: LiveData[Miss|None]
-
-    image_main: LiveData[bytes|None]
-    image_sub: LiveData[bytes|None]
-
-    can_delete_miss: LiveData[bool]
-    can_modify_problem: LiveData[bool]
 
     def __init__(self):
         super().__init__()
@@ -55,52 +35,63 @@ class MissViewModel(QObject):
         self.miss_repository = MissRepository()
         self.problem_repository = ProblemRepository()
         self.image_repository = ImageRepository()
-
-        self.student = None
+        self.student: Student | None = None
         self.miss_list = MutableLiveData([])
         self.current_miss_index = MutableLiveData(-1)
+        self.current_miss: LiveData[Miss | None]
+        self.image_main: LiveData[bytes | None]
+        self.image_sub: LiveData[bytes | None]
+        self.can_delete_miss: LiveData[bool]
+        self.can_modify_problem: LiveData[bool]
 
         self.current_miss = map2(
-            self.miss_list, 
+            self.miss_list,
             self.current_miss_index,
-            lambda list, i: 
-                list[i] 
-                if (list is not None) and (i >= 0) and (i < len(list))
-                else None
+            lambda list, i: (
+                list[i] if (list is not None) and (i >= 0) and (i < len(list)) else None
+            ),
         )
 
         self.image_main = map(
             self.current_miss,
-            lambda miss: 
+            lambda miss: (
                 self.image_repository.load_problem_image(miss.problem_header, True)
                 if miss is not None
                 else None
+            ),
         )
         self.image_sub = map(
             self.current_miss,
-            lambda miss:
+            lambda miss: (
                 self.image_repository.load_problem_image(miss.problem_header, False)
                 if miss is not None
                 else None
+            ),
         )
 
         self.can_delete_miss = map(self.current_miss, lambda miss: miss is not None)
         self.can_modify_problem = map(self.current_miss, lambda miss: miss is not None)
 
-    def on_start(self, arguments: dict):
-        self.student = arguments["student"]
-        self._update_miss_list()
-        self._reset_miss_index(True)
+    def on_start(self, arguments: dict[str, object] | None):
+        if (arguments is not None) and ("student" in arguments):
+            student = arguments["student"]
+            if isinstance(student, Student):
+                self.student = student
+                self._update_miss_list()
+                self._reset_miss_index(True)
 
-    def on_result(self, data: dict):
-        if (data is not None) and (self.student is not None):
-            problem: Problem = data["problem"]
-            miss = Miss(self.student.id, problem.id, ProblemHeader.from_problem(problem))
-            self.miss_repository.insert(miss)
-            self._update_miss_list()
-            self._select_miss_index(miss)
-        else:
-            self._update_miss_list()
+    def on_result(self, result: dict[str, object] | None):
+        if self.student is None:
+            return
+        if (result is not None) and ("problem" in result):
+            problem = result["problem"]
+            if isinstance(problem, Problem):
+                header = ProblemHeader.from_problem(problem)
+                miss = Miss(self.student.id, problem.id, header)
+                self.miss_repository.insert(miss)
+                self._update_miss_list()
+                self._select_miss_index(miss)
+        self._update_miss_list()
 
     def on_miss_selected(self, row: int, column: int):
         self.current_miss_index.set_value(row)
@@ -119,13 +110,14 @@ class MissViewModel(QObject):
         if self.current_miss.value is None:
             self._reset_miss_index(False)
 
-    def on_problem_header_result(self, header: ProblemHeader):
+    def on_problem_header_result(self, header: ProblemHeader | None):
         if (header is None) or (self.student is None):
             return
         problem_existing = self.problem_repository.query_by_header(header)
         if len(problem_existing) > 0:
             problem: Problem = problem_existing[0]
-            miss = Miss(self.student.id, problem.id, ProblemHeader.from_problem(problem))
+            header = ProblemHeader.from_problem(problem)
+            miss = Miss(self.student.id, problem.id, header)
             self.miss_repository.insert(miss)
             self._update_miss_list()
         else:
@@ -146,13 +138,10 @@ class MissViewModel(QObject):
             self.current_miss_index.set_value(index)
         except ValueError:
             self.current_miss_index.set_value(-1)
-            
-    def _reset_miss_index(self, begin_or_end: bool=True):
+
+    def _reset_miss_index(self, begin_or_end: bool = True):
         m_list = self.miss_list.value
         if len(m_list) == 0:
             self.current_miss_index.set_value(-1)
             return
-        if begin_or_end:
-                self.current_miss_index.set_value(0)
-        else:
-            self.current_miss_index.set_value(len(m_list) - 1)
+        self.current_miss_index.set_value(0 if begin_or_end else len(m_list) - 1)
