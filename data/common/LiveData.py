@@ -1,5 +1,7 @@
 from typing import Callable, TypeVar
 
+from ui.common.Fragment import Fragment
+
 
 T = TypeVar("T")  # Define the type variable
 
@@ -18,12 +20,13 @@ class LiveData[T]:
     def _publish(self):
         self._set_value(self.value)
 
-    def observe(self, observer: Callable[[T], None]):
-        if observer is not None:
-            observer(self.value)
-            self.observers.append(observer)
-            if self.value is not None:
-                observer(self.value)
+    def _observe(self, observer: Callable[[T], None]):
+        observer(self.value)
+        self.observers.append(observer)
+
+    def observe(self, fragment: Fragment, observer: Callable[[T], None]):
+        self._observe(observer)
+        fragment.observe_resume(lambda: self._publish())
 
 
 class MutableLiveData[T](LiveData[T]):
@@ -39,7 +42,7 @@ class MutableLiveData[T](LiveData[T]):
 
 def map[S, T](source: LiveData[S], t: Callable[[S], T]) -> LiveData[T]:
     data = LiveData(t(source.value))
-    source.observe(lambda value: data._set_value(t(value)))
+    source._observe(lambda value: data._set_value(t(value)))
     return data
 
 
@@ -47,8 +50,8 @@ def map2[
     S1, S2, T
 ](s1: LiveData[S1], s2: LiveData[S2], t: Callable[[S1, S2], T]) -> LiveData[T]:
     data = LiveData(t(s1.value, s2.value))
-    s1.observe(lambda value: data._set_value(t(value, s2.value)))
-    s2.observe(lambda value: data._set_value(t(s1.value, value)))
+    s1._observe(lambda value: data._set_value(t(value, s2.value)))
+    s2._observe(lambda value: data._set_value(t(s1.value, value)))
     return data
 
 
@@ -58,9 +61,9 @@ def map3[
     s1: LiveData[S1], s2: LiveData[S2], s3: LiveData[S3], t: Callable[[S1, S2, S3], T]
 ) -> LiveData[T]:
     data = LiveData(t(s1.value, s2.value, s3.value))
-    s1.observe(lambda value: data._set_value(t(value, s2.value, s3.value)))
-    s2.observe(lambda value: data._set_value(t(s1.value, value, s3.value)))
-    s3.observe(lambda value: data._set_value(t(s1.value, s2.value, value)))
+    s1._observe(lambda value: data._set_value(t(value, s2.value, s3.value)))
+    s2._observe(lambda value: data._set_value(t(s1.value, value, s3.value)))
+    s3._observe(lambda value: data._set_value(t(s1.value, s2.value, value)))
     return data
 
 
@@ -74,8 +77,8 @@ def map4[
     t: Callable[[S1, S2, S3, S4], T],
 ) -> LiveData[T]:
     data = LiveData(t(s1.value, s2.value, s3.value, s4.value))
-    s1.observe(lambda value: data._set_value(t(value, s2.value, s3.value, s4.value)))
-    s2.observe(lambda value: data._set_value(t(s1.value, value, s3.value, s4.value)))
-    s3.observe(lambda value: data._set_value(t(s1.value, s2.value, value, s4.value)))
-    s4.observe(lambda value: data._set_value(t(s1.value, s2.value, s3.value, value)))
+    s1._observe(lambda value: data._set_value(t(value, s2.value, s3.value, s4.value)))
+    s2._observe(lambda value: data._set_value(t(s1.value, value, s3.value, s4.value)))
+    s3._observe(lambda value: data._set_value(t(s1.value, s2.value, value, s4.value)))
+    s4._observe(lambda value: data._set_value(t(s1.value, s2.value, s3.value, value)))
     return data

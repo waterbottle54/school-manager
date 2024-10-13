@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
 )
 from data.SchoolRepository import *
 from common.Utils import *
-from common.LiveData import *
+from data.common.LiveData import *
 import numpy as np
 from data.Student import *
 
@@ -38,7 +38,7 @@ class AddStudentDialog(QDialog):
         self.setWindowTitle("학생 등록")
         self.setup_ui()
 
-        self.is_input_valid.observe(lambda valid: self.button_submit.setEnabled(valid))
+        self.is_input_valid._observe(lambda valid: self.button_submit.setEnabled(valid))
 
     def setup_ui(self):
         self.setContentsMargins(16, 16, 16, 16)

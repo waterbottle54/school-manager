@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSignal
-from common.LiveData import *
+from data.common.LiveData import *
 
 
 class AdminViewModel(QObject):

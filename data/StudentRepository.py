@@ -5,13 +5,21 @@ from data.Student import *
 
 class StudentRepository(DatabaseRepository["Student"]):
 
+    _instance: "StudentRepository | None" = None
+
+    @staticmethod
+    def get_instance() -> "StudentRepository":
+        if StudentRepository._instance is None:
+            StudentRepository._instance = StudentRepository()
+        return StudentRepository._instance
+
     def __init__(self):
         super().__init__("db_app", "student", "s_id", 1)
 
     def on_create_table(self, db):
         db.cursor.execute(
             f"""
-            CREATE TABLE {self.table_name} (
+            CREATE TABLE {self._table_name} (
             s_id INTEGER PRIMARY KEY AUTOINCREMENT, 
             name TEXT NOT NULL, 
             grade INTEGER NOT NULL, 
@@ -29,8 +37,14 @@ class StudentRepository(DatabaseRepository["Student"]):
         created = row[4]
         return Student(name, grade, school, id, created)
 
-    def query(self) -> list:
-        return super().query(f"SELECT * FROM {self.table_name} ORDER BY grade DESC")
+    def _sql_query_all(self) -> str:
+        return f"SELECT * FROM {self._table_name} ORDER BY grade DESC"
+
+    def get_students(self) -> list[Student]:
+        return super().query(self._sql_query_all())
+
+    def get_students_live(self) -> LiveData[list[Student]]:
+        return super().get_livedata(self._sql_query_all())
 
     def insert(self, student: Student):
         super().insert(student.to_record(), student.id == -1)

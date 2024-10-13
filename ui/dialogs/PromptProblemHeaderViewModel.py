@@ -1,6 +1,6 @@
 from data.common.ListRepository import *
 from common.Utils import *
-from common.LiveData import *
+from data.common.LiveData import *
 from data.Student import *
 from data.BookRepository import *
 from data.ProblemRepository import *
@@ -20,7 +20,7 @@ class PromptProblemHeaderViewModel:
 
         self.book_repository = BookRepository()
         self.chapter_repository = ChapterRepository()
-        self.problem_repository = ProblemRepository()
+        self.problem_repository = ProblemRepository.get_instance()
 
         self.book_list = self.book_repository.get_list()
         self.current_book_index = MutableLiveData(-1)

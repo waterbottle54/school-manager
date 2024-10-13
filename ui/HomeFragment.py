@@ -19,6 +19,7 @@ class HomeFragment(Fragment):
         self.view_model.event.connect(self.on_event)
 
     def on_resume(self):
+        super().on_resume()
         self.name_edit: QLineEdit
         self.name_edit.setText("")
         self.name_edit.setFocus()

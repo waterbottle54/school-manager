@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
 )
 
 from common.StringRes import *
+from ui.common import UiUtils
 from ui.common.Fragment import *
 from ui.common.Navigation import *
 from ui.common.UiUtils import *
@@ -26,134 +27,55 @@ class StudentFragment(Fragment):
     def __init__(self, title):
         super().__init__(title)
 
-        self.view_model = StudentViewModel()
-        self.layout_top = QHBoxLayout()
-        self.left_layout = QVBoxLayout()
-        self.right_layout = QVBoxLayout()
+        self._view_model = StudentViewModel()
+        self._layout_top = QHBoxLayout()
+        self._layout_table_sector: QVBoxLayout
+        self._layout_detail_sector: QVBoxLayout
 
-        self.setLayout(self.layout_top)
+        self.setLayout(self._layout_top)
 
-        self.layout_top.addLayout(self.left_layout)
-        self.layout_top.addSpacing(16)
-        self.layout_top.addLayout(self.right_layout)
+        self._layout_table_sector = self._setup_table_sector()
+        self._layout_detail_sector = self._setup_detail_sector()
 
-        self.setup_student_table_sector()
-        self.setup_student_detail_sector()
+        self._layout_top.addLayout(self._layout_table_sector)
+        self._layout_top.addSpacing(16)
+        self._layout_top.addLayout(self._layout_detail_sector)
 
-        self.view_model.student_list.observe(self.update_student_table)
-        self.view_model.student_index.observe(self.update_student_selection)
-        self.view_model.can_delete_student.observe(
-            self.button_delete_student.setEnabled
+        self._view_model.get_student_list().observe(self, self._update_student_table)
+        self._view_model.get_student_index().observe(
+            self,
+            lambda i: QTimer.singleShot(10, lambda: self._update_student_selection(i)),
         )
-        self.view_model.current_student.observe(self.update_student_detail)
+        self._view_model.get_selected_student().observe(
+            self, self._update_student_detail
+        )
+        self._view_model.can_delete_student.observe(
+            self, self._btn_delete_student.setEnabled
+        )
 
-        self.view_model.event.connect(self.on_event)
+        self._view_model.event.connect(self.on_event)
 
-    def on_start(self, arguments: dict[str, object]):
-        self.view_model.on_start()
+    def on_resume(self):
+        super().on_resume()
 
     def on_event(self, event: StudentViewModel.Event):
         if isinstance(event, StudentViewModel.NavigateToMissScreen):
             Navigation.get_instance().navigate(MissFragment, {"student": event.student})
         elif isinstance(event, StudentViewModel.PromptStudent):
-            self.prompt_student()
+            self._prompt_student()
         elif isinstance(event, StudentViewModel.ConfirmDeleteStudent):
-            self.confirm_delete_student(event.student)
+            self._confirm_delete_student(event.student)
 
-    def update_student_table(self, student_list: list[Student]):
-        self.tw_student.setRowCount(len(student_list))
-        for i, student in enumerate(student_list):
-            student: Student
-            self.tw_student.setItem(
-                i, 0, self.table_item_center(grade_name(student.grade))
-            )
-            self.tw_student.setItem(i, 1, self.table_item_center(student.name))
-            self.tw_student.setItem(i, 2, self.table_item_center(student.school))
+    # event procedures
 
-    def update_student_detail(self, student: Student | None):
-        if student is not None:
-            text_detail = "◎  {:^6} | {:^6} | {:^12}".format(
-                student.name, grade_name(student.grade), student.school
-            )
-            self.label_student.setText(text_detail)
-        else:
-            self.label_student.setText("")
-
-        self.button_miss_manage.setVisible(student is not None)
-
-    def table_item_center(self, text: str):
-        item = QTableWidgetItem(text)
-        item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        return item
-
-    def update_student_selection(self, row: int):
-        if (row >= 0) and (row < self.tw_student.rowCount()):
-            self.tw_student.selectRow(row)
-            self.tw_student.setFocus()
-
-    def setup_student_table_sector(self):
-        self.tw_student = QTableWidget()
-        self.left_layout.addWidget(self.tw_student)
-
-        self.tw_student.setColumnCount(3)
-        self.tw_student.setColumnWidth(0, 100)
-        self.tw_student.setColumnWidth(1, 100)
-        self.tw_student.setColumnWidth(2, 200)
-        self.tw_student.setFixedWidth(405)
-
-        self.tw_student.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.tw_student.setSelectionMode(QTableWidget.SingleSelection)
-        self.tw_student.setSelectionBehavior(QTableWidget.SelectRows)
-        vertical_header = self.tw_student.verticalHeader()
-        if vertical_header is not None:
-            vertical_header.setVisible(False)
-        self.tw_student.setHorizontalHeaderLabels(["학년", "이름", "학교"])
-
-        self.tw_student.cellClicked.connect(self.view_model.on_student_click)
-
-        # buttons
-        self.button_add_student = QPushButton("학생 등록")
-        self.button_add_student.setObjectName("modify")
-        self.button_add_student.clicked.connect(self.view_model.on_add_student_click)
-
-        self.button_delete_student = QPushButton("학생 삭제")
-        self.button_delete_student.setObjectName("modify")
-        self.button_delete_student.clicked.connect(
-            self.view_model.on_delete_student_click
-        )
-
-        self.left_layout.addWidget(self.button_add_student)
-        self.left_layout.addWidget(self.button_delete_student)
-
-    def setup_student_detail_sector(self):
-
-        self.right_header_layout = QHBoxLayout()
-        self.right_layout.addLayout(self.right_header_layout)
-
-        self.label_student = QLabel()
-        self.label_student.setContentsMargins(8, 8, 8, 8)
-        self.right_header_layout.addWidget(self.label_student)
-
-        self.right_header_layout.addStretch(1)
-
-        self.button_miss_manage = QPushButton("오답 관리")
-        self.button_miss_manage.setFixedWidth(150)
-        self.button_miss_manage.setObjectName("modify")
-        self.button_miss_manage.clicked.connect(self.view_model.on_miss_manage_click)
-
-        self.right_header_layout.addWidget(self.button_miss_manage)
-
-        self.lw_detail = QListWidget()
-        self.right_layout.addWidget(self.lw_detail)
-
-    def prompt_student(self):
+    def _prompt_student(self):
         dialog = AddStudentDialog()
         if dialog.exec_() == QDialog.Accepted:
             student = dialog.get_student()
             if student is not None:
-                self.view_model.on_add_student_result(student)
+                self._view_model.on_add_student_result(student)
 
-    def confirm_delete_student(self, student: Student):
+    def _confirm_delete_student(self, student: Student):
         msg_box = QMessageBox()
         msg_box.setWindowTitle("학생 삭제")
         msg_box.setText(f"{student.name} 학생을 삭제하시겠습니까?")
@@ -162,4 +84,114 @@ class StudentFragment(Fragment):
 
         result = msg_box.exec_()
         if result == QMessageBox.Ok:
-            self.view_model.on_delete_student_confirm(student)
+            self._view_model.on_delete_student_confirm(student)
+
+    # UI update listeners
+
+    def _update_student_table(self, student_list: list[Student]):
+        self._tw_student.setRowCount(len(student_list))
+        for i, student in enumerate(student_list):
+            student: Student
+            self._tw_student.setItem(
+                i, 0, UiUtils.table_item_center(grade_name(student.grade))
+            )
+            self._tw_student.setItem(i, 1, UiUtils.table_item_center(student.name))
+            self._tw_student.setItem(i, 2, UiUtils.table_item_center(student.school))
+
+    def _update_student_detail(self, student: Student | None):
+        if student is not None:
+            text_detail = "◎  {:^6} | {:^6} | {:^12}".format(
+                student.name, grade_name(student.grade), student.school
+            )
+            self._label_student.setText(text_detail)
+        else:
+            self._label_student.setText("")
+
+        self._btn_miss_manage.setVisible(student is not None)
+
+    def _update_student_selection(self, row: int):
+        if (row >= 0) and (row < self._tw_student.rowCount()):
+            self._tw_student.selectRow(row)
+            self._tw_student.setFocus()
+
+    # initialization procedures
+
+    def _setup_table_sector(self) -> QVBoxLayout:
+
+        self._layout_table_sector = QVBoxLayout()
+
+        # student table
+        self._tw_student = self._create_student_table()
+
+        # add student button
+        self._btn_add_student = QPushButton("학생 등록")
+        self._btn_add_student.setObjectName("modify")
+        self._btn_add_student.clicked.connect(self._view_model.on_add_student_click)
+
+        # delete student button
+        self._btn_delete_student = QPushButton("학생 삭제")
+        self._btn_delete_student.setObjectName("modify")
+        self._btn_delete_student.clicked.connect(
+            self._view_model.on_delete_student_click
+        )
+
+        # placement
+        self._layout_table_sector.addWidget(self._tw_student)
+        self._layout_table_sector.addWidget(self._btn_add_student)
+        self._layout_table_sector.addWidget(self._btn_delete_student)
+
+        return self._layout_table_sector
+
+    def _setup_detail_sector(self) -> QVBoxLayout:
+
+        self._layout_detail_sector = QVBoxLayout()
+
+        # headline
+        layout_headline = QHBoxLayout()
+
+        # - student info label
+        self._label_student = QLabel()
+        self._label_student.setContentsMargins(8, 8, 8, 8)
+
+        # - miss management button
+        self._btn_miss_manage = QPushButton("오답 관리")
+        self._btn_miss_manage.setFixedWidth(150)
+        self._btn_miss_manage.setObjectName("modify")
+        self._btn_miss_manage.clicked.connect(self._view_model.on_miss_manage_click)
+
+        # - placemant
+        layout_headline.addWidget(self._label_student)
+        layout_headline.addStretch(1)
+        layout_headline.addWidget(self._btn_miss_manage)
+
+        # student detail
+        self._lw_detail = QListWidget()
+
+        # placement
+        self._layout_detail_sector.addLayout(layout_headline)
+        self._layout_detail_sector.addWidget(self._lw_detail)
+
+        return self._layout_detail_sector
+
+    def _create_student_table(self) -> QTableWidget:
+
+        tw = QTableWidget()
+
+        tw.setColumnCount(3)
+        tw.setColumnWidth(0, 100)
+        tw.setColumnWidth(1, 100)
+        tw.setColumnWidth(2, 200)
+        tw.setFixedWidth(405)
+
+        tw.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        tw.setSelectionMode(QTableWidget.SingleSelection)
+        tw.setSelectionBehavior(QTableWidget.SelectRows)
+
+        vertical_header = tw.verticalHeader()
+        if vertical_header is not None:
+            vertical_header.setVisible(False)
+        else:
+            tw.setHorizontalHeaderLabels(["학년", "이름", "학교"])
+
+        tw.cellClicked.connect(self._view_model.on_student_click)
+        return tw

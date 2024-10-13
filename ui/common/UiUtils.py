@@ -9,13 +9,6 @@ def table_item_center(text: str) -> QTableWidgetItem:
     return item
 
 
-def disconnect(signal: pyqtBoundSignal):
-    try:
-        signal.disconnect()
-    except:
-        pass
-
-
 def set_label_image(label: QLabel, data: bytes | None):
     if data is not None:
         pixmap = QPixmap()

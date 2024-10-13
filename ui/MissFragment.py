@@ -36,13 +36,15 @@ class MissFragment(Fragment):
         self.labelImageMain.setScaledContents(True)
         self.labelImageSub.setScaledContents(True)
 
-        self.view_model.miss_list.observe(self._update_miss_table)
-        self.view_model.current_miss_index.observe(self._update_miss_selection)
-        self.view_model.current_miss.observe(self._update_miss_detail)
-        self.view_model.can_delete_miss.observe(self.buttonDeleteMiss.setEnabled)
-        self.view_model.can_modify_problem.observe(self.buttonModifyProblem.setEnabled)
-        self.view_model.image_main.observe(self._update_main_image)
-        self.view_model.image_sub.observe(self._update_sub_image)
+        self.view_model.get_miss_list().observe(self, self._update_miss_table)
+        self.view_model.get_miss_index().observe(self, self._update_miss_selection)
+        self.view_model.get_selected_miss().observe(self, self._update_miss_detail)
+        self.view_model.can_delete_miss.observe(self, self.buttonDeleteMiss.setEnabled)
+        self.view_model.can_modify_problem.observe(
+            self, self.buttonModifyProblem.setEnabled
+        )
+        self.view_model.image_main.observe(self, self._update_main_image)
+        self.view_model.image_sub.observe(self, self._update_sub_image)
 
         self.view_model.event.connect(self.on_event)
 
@@ -54,6 +56,9 @@ class MissFragment(Fragment):
 
     def on_restart(self, result: dict):
         self.view_model.on_result(result)
+
+    def on_resume(self):
+        super().on_resume()
 
     def on_event(self, event: MissViewModel.Event):
         if isinstance(event, MissViewModel.PromptProblemHeader):

@@ -25,13 +25,13 @@ class PromptProblemHeaderDialog(QDialog):
         self.setWindowTitle("문제 입력")
         self.setup_ui()
 
-        self.view_model.chapter_list.observe(self.update_chapter_combo)
-        self.view_model.current_book_index.observe(self.combo_book.setCurrentIndex)
-        self.view_model.current_grade_index.observe(self.combo_grade.setCurrentIndex)
-        self.view_model.current_chapter_index.observe(
+        self.view_model.chapter_list._observe(self.update_chapter_combo)
+        self.view_model.current_book_index._observe(self.combo_book.setCurrentIndex)
+        self.view_model.current_grade_index._observe(self.combo_grade.setCurrentIndex)
+        self.view_model.current_chapter_index._observe(
             self.combo_chapter.setCurrentIndex
         )
-        self.view_model.is_input_valid.observe(self.button_submit.setEnabled)
+        self.view_model.is_input_valid._observe(self.button_submit.setEnabled)
 
         QTimer.singleShot(100, self.view_model.on_tick)
         self.edit_title.setFocus()

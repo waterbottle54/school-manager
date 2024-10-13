@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from common.LiveData import *
+from data.common.LiveData import *
 from data.common.LiveList import *
 from data.ChapterRepository import *
 from data.SchoolRepository import *

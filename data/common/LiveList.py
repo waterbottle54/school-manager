@@ -1,5 +1,5 @@
 from typing import Callable
-from common.LiveData import LiveData, MutableLiveData, map2
+from data.common.LiveData import LiveData, MutableLiveData, map2
 
 
 class LiveList[T]:
@@ -27,7 +27,7 @@ class LiveList[T]:
             None
         )
         self._is_get_default_one_shot: bool = True
-        self._lst.observe(self.on_list_data_changed)
+        self._lst._observe(self.on_list_data_changed)
 
     def on_list_data_changed(self, lst: list[T]):
         current_index = self._idx.value

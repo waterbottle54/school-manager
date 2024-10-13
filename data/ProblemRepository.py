@@ -6,13 +6,21 @@ from data.ProblemHeader import *
 
 class ProblemRepository(DatabaseRepository["Problem"]):
 
+    _instance: "ProblemRepository | None" = None
+
+    @staticmethod
+    def get_instance() -> "ProblemRepository":
+        if ProblemRepository._instance is None:
+            ProblemRepository._instance = ProblemRepository()
+        return ProblemRepository._instance
+
     def __init__(self):
         super().__init__("db_app", "problem", "p_id", 1)
 
     def on_create_table(self, db):
         db.cursor.execute(
             f"""
-            CREATE TABLE {self.table_name} (
+            CREATE TABLE {self._table_name} (
             p_id INTEGER PRIMARY KEY AUTOINCREMENT, 
             grade INTEGER NOT NULL, 
             chapter TEXT NOT NULL, 
@@ -29,10 +37,8 @@ class ProblemRepository(DatabaseRepository["Problem"]):
     def to_object(self, record: list[object]) -> Problem:
         return Problem.from_record(record)
 
-    def query_all(self) -> list:
-        return super().query(f"SELECT * FROM {self.table_name} ORDER BY created DESC")
-
-    def query(self, book: str, grade: int, chapter: str) -> list[Problem]:
+    def get_problems(self, book: str, grade: int, chapter: str) -> list[Problem]:
+        print(f"{book}, {grade}, {chapter}")
         ordering = """
             ORDER BY CASE 
             WHEN title NOT LIKE "%[^0-9]%" 
@@ -42,7 +48,7 @@ class ProblemRepository(DatabaseRepository["Problem"]):
         """
         return super().query(
             f"""
-            SELECT * FROM {self.table_name} 
+            SELECT * FROM {self._table_name} 
             WHERE book = ? 
             AND grade = ? 
             AND chapter = ? 
@@ -51,10 +57,10 @@ class ProblemRepository(DatabaseRepository["Problem"]):
             (book, grade, chapter),
         )
 
-    def query_by_header(self, h: ProblemHeader) -> list[Problem]:
-        return super().query(
+    def get_problem_by_header(self, h: ProblemHeader) -> Problem | None:
+        _list = super().query(
             f"""
-            SELECT * FROM {self.table_name} 
+            SELECT * FROM {self._table_name} 
             WHERE book = ? 
             AND grade = ? 
             AND chapter = ? 
@@ -62,6 +68,7 @@ class ProblemRepository(DatabaseRepository["Problem"]):
             """,
             (h.book, h.grade, h.chapter, h.title),
         )
+        return _list[0] if (len(_list) > 0) else None
 
     def insert(self, problem: Problem):
         super().insert(problem.to_record(), problem.id == -1)

@@ -44,29 +44,31 @@ class DataFragment(Fragment):
 
         self.view_model.on_grade_change(0)
 
-        self.view_model.school_list_live().observe(self.update_school_lw)
-        self.view_model.book_list_live().observe(self.update_book_lw)
-        self.view_model.chapter_list_live().observe(self.update_chapter_lw)
+        self.view_model.school_list_live().observe(self, self.update_school_lw)
+        self.view_model.book_list_live().observe(self, self.update_book_lw)
+        self.view_model.chapter_list_live().observe(self, self.update_chapter_lw)
 
         self.view_model.school_index_live().observe(
-            lambda i: QTimer.singleShot(10, lambda: self.update_school_selection(i))
+            self,
+            lambda i: QTimer.singleShot(10, lambda: self.update_school_selection(i)),
         )
         self.view_model.book_index_live().observe(
-            lambda i: QTimer.singleShot(10, lambda: self.update_book_selection(i))
+            self, lambda i: QTimer.singleShot(10, lambda: self.update_book_selection(i))
         )
         self.view_model.chapter_index_live().observe(
-            lambda i: self.button_remove_chapter.setEnabled(i != -1)
+            self, lambda i: self.button_remove_chapter.setEnabled(i != -1)
         )
         self.view_model.chapter_index_live().observe(
-            lambda i: QTimer.singleShot(10, lambda: self.update_chapter_selection(i))
+            self,
+            lambda i: QTimer.singleShot(10, lambda: self.update_chapter_selection(i)),
         )
         self.view_model.can_move_chapter_left.observe(
-            lambda can: self.button_chapter_up.setEnabled(can)
+            self, lambda can: self.button_chapter_up.setEnabled(can)
         )
         self.view_model.can_move_chapter_right.observe(
-            lambda can: self.button_chapter_down.setEnabled(can)
+            self, lambda can: self.button_chapter_down.setEnabled(can)
         )
-        self.view_model.grade_live().observe(self.cb_grade.setCurrentIndex)
+        self.view_model.grade_live().observe(self, self.cb_grade.setCurrentIndex)
 
         self.view_model.event.connect(self.on_event)
 
@@ -93,67 +95,63 @@ class DataFragment(Fragment):
         self.view_model.on_delete_chapter_click()
 
     def update_school_lw(self, schools):
-        UiUtils.disconnect(self.lw_school.currentRowChanged)
-
-        self.lw_school.clear()
-        self.lw_school.addItems(schools)
-
-        self.lw_school.currentRowChanged.connect(self.view_model.on_school_click)
+        if not self.lw_school.signalsBlocked():
+            self.lw_school.blockSignals(True)
+            self.lw_school.clear()
+            self.lw_school.addItems(schools)
+            self.lw_school.blockSignals(False)
 
     def update_school_selection(self, index):
-        UiUtils.disconnect(self.lw_school.currentRowChanged)
+        if not self.lw_school.signalsBlocked():
+            self.lw_school.blockSignals(True)
+            self.button_remove_school.setEnabled(index != -1)
 
-        self.button_remove_school.setEnabled(index != -1)
+            if index < 0 or index >= self.lw_school.count():
+                self.lw_school.blockSignals(False)
+                self.lw_school.clearSelection()
+                return
 
-        if index < 0 or index >= self.lw_school.count():
-            self.lw_school.clearSelection()
-            return
-
-        self.lw_school.setCurrentRow(index)
-        self.lw_school.setFocus()
-
-        self.lw_school.currentRowChanged.connect(self.view_model.on_school_click)
+            self.lw_school.setCurrentRow(index)
+            self.lw_school.setFocus()
+            self.lw_school.blockSignals(False)
 
     def update_book_lw(self, books):
-        UiUtils.disconnect(self.lw_book.currentRowChanged)
-
-        self.lw_book.clear()
-        self.lw_book.addItems(books)
-
-        self.lw_book.currentRowChanged.connect(self.view_model.on_book_click)
+        if not self.lw_book.signalsBlocked():
+            self.lw_book.blockSignals(True)
+            self.lw_book.clear()
+            self.lw_book.addItems(books)
+            self.lw_book.blockSignals(False)
 
     def update_book_selection(self, index):
-        UiUtils.disconnect(self.lw_book.currentRowChanged)
+        if not self.lw_book.signalsBlocked():
+            self.lw_book.blockSignals(True)
+            self.button_remove_book.setEnabled(index != -1)
 
-        self.button_remove_book.setEnabled(index != -1)
-
-        if index < 0 or index >= self.lw_book.count():
-            self.lw_book.clearSelection()
-            return
-        self.lw_book.setCurrentRow(index)
-        self.lw_book.setFocus()
-
-        self.lw_book.currentRowChanged.connect(self.view_model.on_book_click)
+            if index < 0 or index >= self.lw_book.count():
+                self.lw_book.clearSelection()
+                self.lw_book.blockSignals(False)
+                return
+            self.lw_book.setCurrentRow(index)
+            self.lw_book.setFocus()
 
     def update_chapter_lw(self, chapters):
-        UiUtils.disconnect(self.lw_chapter.currentRowChanged)
-
-        self.lw_chapter.clear()
-        self.lw_chapter.addItems(chapters)
-
-        self.lw_chapter.currentRowChanged.connect(self.view_model.on_chapter_click)
+        if not self.lw_chapter.signalsBlocked():
+            self.lw_chapter.blockSignals(True)
+            self.lw_chapter.clear()
+            self.lw_chapter.addItems(chapters)
+            self.lw_chapter.blockSignals(False)
 
     def update_chapter_selection(self, index):
-        UiUtils.disconnect(self.lw_chapter.currentRowChanged)
+        if not self.lw_chapter.signalsBlocked():
+            self.lw_chapter.blockSignals(True)
+            if index < 0 or index >= self.lw_chapter.count():
+                self.lw_chapter.clearSelection()
+                self.lw_chapter.blockSignals(False)
+                return
 
-        if index < 0 or index >= self.lw_chapter.count():
-            self.lw_chapter.clearSelection()
-            return
-
-        self.lw_chapter.setCurrentRow(index)
-        self.lw_chapter.setFocus()
-
-        self.lw_chapter.currentRowChanged.connect(self.view_model.on_chapter_click)
+            self.lw_chapter.setCurrentRow(index)
+            self.lw_chapter.setFocus()
+            self.lw_chapter.blockSignals(False)
 
     def prompt_school_name(self):
         school_name, ok = QInputDialog.getText(self, "학교 추가", "학교명")

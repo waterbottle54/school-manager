@@ -36,7 +36,7 @@ class Navigation:
 
     def setup_with_toolbar(self, toolbar: Toolbar):
         self.toolbar = toolbar
-        toolbar.get_back_button().clicked.connect(self.navigate_back)
+        toolbar.get_back_button().clicked.connect(lambda: self.navigate_back())
 
     def navigate(self, cls, arguments: dict[str, Any] | None = None):
         if cls not in self.graph:
@@ -52,7 +52,7 @@ class Navigation:
         self.current_fragment.on_start(arguments)
         self.on_fragment_change()
 
-    def navigate_back(self, data_result: dict[str, Any] | None = None):
+    def navigate_back(self, data_result: dict[str, object] | None = None):
         if self.current_fragment is None:
             return
         if len(self.back_stack) > 0:

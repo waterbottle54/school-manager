@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from common.LiveData import *
+from data.common.LiveData import *
 from data.BookRepository import *
 from data.ChapterRepository import *
 from data.common.DictOfListRepository import *
@@ -44,7 +44,7 @@ class ProblemViewModel(QObject):
         # Member variables declaration
         self._book_repository = BookRepository()
         self._chapter_repository = ChapterRepository()
-        self._problem_repository = ProblemRepository()
+        self._problem_repository = ProblemRepository.get_instance()
         self._image_repository = ImageRepository()
 
         self._book_list: LiveList[str]
@@ -61,7 +61,7 @@ class ProblemViewModel(QObject):
         # End of member variables declaration
 
         self._book_list = LiveList(self._book_repository.get_list_livedata())
-        self._grade_list = MutableLiveList([i for i in range(6, 12)])
+        self._grade_list = MutableLiveList([i for i in range(0, 12)])
 
         chapter_list_livedata = map2(
             self._chapter_repository.get_dict_livedata(),
@@ -77,7 +77,7 @@ class ProblemViewModel(QObject):
             lambda book, grade, chapter: (
                 []
                 if (book is None) or (grade is None) or (chapter is None)
-                else self._problem_repository.query(book, grade, chapter)
+                else self._problem_repository.get_problems(book, grade, chapter)
             ),
         )
         self._problem_list = LiveList(problem_list_livedata)
@@ -110,25 +110,21 @@ class ProblemViewModel(QObject):
             self._problem_list.selected_livedata(), lambda problem: problem is not None
         )
 
-    def on_start(self):
-        self._book_repository.update_livedata()
-        self._chapter_repository.update_livedata()
-
     def on_restart(self, problem: Problem):
         self._problem_list.select(problem)
 
-    def on_problem_click(self, row, column):
+    def on_problem_click(self, row: int, column: int):
         self._problem_list.select_at(row)
 
     def on_book_change(self, index):
         self._book_list.select_at(index)
         self._problem_list.select_at(0)
 
-    def on_grade_change(self, index):
+    def on_grade_change(self, index: int):
         self._grade_list.select_at(index)
         self._problem_list.select_at(0)
 
-    def on_chapter_change(self, index):
+    def on_chapter_change(self, index: int):
         self._chapter_list.select_at(index)
         self._problem_list.select_at(0)
 
@@ -142,8 +138,8 @@ class ProblemViewModel(QObject):
     def on_problem_header_result(self, problem_header: ProblemHeader | None):
         if problem_header is None:
             return
-        existing = self._problem_repository.query_by_header(problem_header)
-        if len(existing) == 0:
+        exists = self._problem_repository.get_problem_by_header(problem_header)
+        if not exists:
             self.event.emit(ProblemViewModel.NavigateToAddProblem(problem_header))
         else:
             self.event.emit(

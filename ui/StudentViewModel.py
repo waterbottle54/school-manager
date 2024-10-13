@@ -1,12 +1,13 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from common.LiveData import *
+from data.common.LiveData import *
 from data.common.DictOfListRepository import *
 from data.common.ListRepository import *
 from data.ProblemHeader import *
 from data.ProblemRepository import *
 from data.Student import *
 from data.StudentRepository import *
+from data.common.LiveList import LiveList
 
 
 class StudentViewModel(QObject):
@@ -30,50 +31,43 @@ class StudentViewModel(QObject):
     def __init__(self):
         super().__init__()
 
-        self.student_repository = StudentRepository()
-        self.problem_repository = ProblemRepository()
-        self.student_list = MutableLiveData([])
-        self.student_index = MutableLiveData(-1)
-        self.current_student: LiveData[Student | None]
+        self._student_repository = StudentRepository.get_instance()
+        self._student_list = LiveList(self._student_repository.get_students_live())
         self.can_delete_student: LiveData[bool]
 
-        self.current_student = map2(
-            self.student_list,
-            self.student_index,
-            lambda list, i: list[i] if i >= 0 and i < len(list) else None,
-        )
         self.can_delete_student = map(
-            self.current_student, lambda student: student is not None
+            self._student_list.selected_livedata(),
+            lambda selected: selected is not None,
         )
-
-    def on_start(self):
-        self.update_student_list()
-        self.student_index.set_value(0)
 
     def on_student_click(self, row: int, col: int):
-        self.student_index.set_value(row)
+        self._student_list.select_at(row)
 
     def on_add_student_click(self):
         self.event.emit(StudentViewModel.PromptStudent())
 
     def on_add_student_result(self, student: Student):
-        self.student_repository.insert(student)
-        self.update_student_list()
+        self._student_list.set_default_index_on_update(True, lambda _, i_end, i: i_end)
+        self._student_repository.insert(student)
 
     def on_delete_student_click(self):
-        student = self.current_student.value
-        if student is not None:
-            self.event.emit(StudentViewModel.ConfirmDeleteStudent(student))
+        student_selected = self._student_list.selected_value()
+        if student_selected is not None:
+            self.event.emit(StudentViewModel.ConfirmDeleteStudent(student_selected))
 
     def on_delete_student_confirm(self, student: Student):
-        self.student_repository.delete(student.id)
-        self.update_student_list()
+        self._student_repository.delete(student.id)
 
     def on_miss_manage_click(self):
-        student = self.current_student.value
-        if student is not None:
-            self.event.emit(StudentViewModel.NavigateToMissScreen(student))
+        student_selected = self._student_list.selected_value()
+        if student_selected is not None:
+            self.event.emit(StudentViewModel.NavigateToMissScreen(student_selected))
 
-    def update_student_list(self):
-        list = self.student_repository.query()
-        self.student_list.set_value(list)
+    def get_student_list(self) -> LiveData[list[Student]]:
+        return self._student_list.list_livedata()
+
+    def get_student_index(self) -> LiveData[int]:
+        return self._student_list.index_livedata()
+
+    def get_selected_student(self) -> LiveData[Student | None]:
+        return self._student_list.selected_livedata()
