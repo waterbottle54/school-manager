@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFrame, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QFrame, QSizePolicy
 from abc import abstractmethod
 from typing import Callable
 
@@ -26,8 +26,14 @@ class Fragment(QFrame):
 
     @abstractmethod
     def on_resume(self):
+        self.block_all_signals(True)
         for observer in self._resume_observers:
             observer()
+        self.block_all_signals(False)
 
     def observe_resume(self, observer: Callable[[], None]):
         self._resume_observers.append(observer)
+
+    def block_all_signals(self, b: bool):
+        for child in self.findChildren(QWidget):
+            child.blockSignals(b)

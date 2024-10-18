@@ -32,7 +32,7 @@ class AddStudentDialog(QDialog):
             and len(_name) > 1,
         )
 
-        self.school_repository = SchoolRepository()
+        self.school_repository = SchoolRepository.get_instance()
         self.school_list = self.school_repository.get_list()
 
         self.setWindowTitle("학생 등록")

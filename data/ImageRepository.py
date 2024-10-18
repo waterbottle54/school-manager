@@ -5,6 +5,14 @@ from data.ProblemHeader import *
 
 class ImageRepository:
 
+    _instance: "ImageRepository | None" = None
+
+    @staticmethod
+    def get_instance() -> "ImageRepository":
+        if ImageRepository._instance is None:
+            ImageRepository._instance = ImageRepository()
+        return ImageRepository._instance
+
     def get_problem_image_path(self, header: ProblemHeader, is_main: bool) -> str:
         return f"images_problem/grade{header.grade}/{header.chapter}/{header.book}-{header.title}({'main' if is_main else 'sub'}).png"
 

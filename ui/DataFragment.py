@@ -72,9 +72,6 @@ class DataFragment(Fragment):
 
         self.view_model.event.connect(self.on_event)
 
-    def on_start(self, arguments: dict | None = None):
-        self.view_model.on_start()
-
     def on_event(self, event):
         if isinstance(event, DataViewModel.NavigateBack):
             Navigation.get_instance().navigate_back()
@@ -95,63 +92,47 @@ class DataFragment(Fragment):
         self.view_model.on_delete_chapter_click()
 
     def update_school_lw(self, schools):
-        if not self.lw_school.signalsBlocked():
-            self.lw_school.blockSignals(True)
-            self.lw_school.clear()
-            self.lw_school.addItems(schools)
-            self.lw_school.blockSignals(False)
+        self.lw_school.clear()
+        self.lw_school.addItems(schools)
 
     def update_school_selection(self, index):
-        if not self.lw_school.signalsBlocked():
-            self.lw_school.blockSignals(True)
-            self.button_remove_school.setEnabled(index != -1)
 
-            if index < 0 or index >= self.lw_school.count():
-                self.lw_school.blockSignals(False)
-                self.lw_school.clearSelection()
-                return
+        self.button_remove_school.setEnabled(index != -1)
 
-            self.lw_school.setCurrentRow(index)
-            self.lw_school.setFocus()
-            self.lw_school.blockSignals(False)
+        if index < 0 or index >= self.lw_school.count():
+            self.lw_school.clearSelection()
+            return
+
+        self.lw_school.setCurrentRow(index)
+        self.lw_school.setFocus()
+            
 
     def update_book_lw(self, books):
-        if not self.lw_book.signalsBlocked():
-            self.lw_book.blockSignals(True)
-            self.lw_book.clear()
-            self.lw_book.addItems(books)
-            self.lw_book.blockSignals(False)
+        self.lw_book.clear()
+        self.lw_book.addItems(books)
 
     def update_book_selection(self, index):
-        if not self.lw_book.signalsBlocked():
-            self.lw_book.blockSignals(True)
-            self.button_remove_book.setEnabled(index != -1)
 
-            if index < 0 or index >= self.lw_book.count():
-                self.lw_book.clearSelection()
-                self.lw_book.blockSignals(False)
-                return
-            self.lw_book.setCurrentRow(index)
-            self.lw_book.setFocus()
+        self.button_remove_book.setEnabled(index != -1)
+
+        if index < 0 or index >= self.lw_book.count():
+            self.lw_book.clearSelection()
+            return
+        
+        self.lw_book.setCurrentRow(index)
+        self.lw_book.setFocus()
 
     def update_chapter_lw(self, chapters):
-        if not self.lw_chapter.signalsBlocked():
-            self.lw_chapter.blockSignals(True)
-            self.lw_chapter.clear()
-            self.lw_chapter.addItems(chapters)
-            self.lw_chapter.blockSignals(False)
+        self.lw_chapter.clear()
+        self.lw_chapter.addItems(chapters)
 
     def update_chapter_selection(self, index):
-        if not self.lw_chapter.signalsBlocked():
-            self.lw_chapter.blockSignals(True)
-            if index < 0 or index >= self.lw_chapter.count():
-                self.lw_chapter.clearSelection()
-                self.lw_chapter.blockSignals(False)
-                return
+        if index < 0 or index >= self.lw_chapter.count():
+            self.lw_chapter.clearSelection()
+            return
 
-            self.lw_chapter.setCurrentRow(index)
-            self.lw_chapter.setFocus()
-            self.lw_chapter.blockSignals(False)
+        self.lw_chapter.setCurrentRow(index)
+        self.lw_chapter.setFocus()
 
     def prompt_school_name(self):
         school_name, ok = QInputDialog.getText(self, "학교 추가", "학교명")

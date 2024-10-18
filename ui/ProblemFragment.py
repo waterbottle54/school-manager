@@ -68,14 +68,11 @@ class ProblemFragment(Fragment):
 
         self._view_model.event.connect(self.on_event)
 
-    def on_resume(self):
-        super().on_resume()
-
     def on_restart(self, result: dict[str, object] | None = None):
         if result is not None:
-            problem = result["problem"]
-            if isinstance(problem, Problem):
-                self._view_model.on_restart(problem)
+            problem_id = result["problem_id"]
+            if isinstance(problem_id, int):
+                self._view_model.on_restart(problem_id)
 
     def on_event(self, event: ProblemViewModel.Event):
         if isinstance(event, ProblemViewModel.NavigateToAddProblem):
@@ -101,57 +98,42 @@ class ProblemFragment(Fragment):
                 self._view_model.on_delete_problem_confirmed(event.problem)
 
     def _update_book_combo(self, b_list: list[str]):
-        if not self._cb_book.signalsBlocked():
-            self._cb_book.blockSignals(True)
-            self._cb_book.clear()
-            self._cb_book.addItems(b_list)
-            self._cb_book.blockSignals(False)
+        self._cb_book.clear()
+        self._cb_book.addItems(b_list)
 
     def _update_chapter_combo(self, c_list: list[str]):
-        if not self._cb_chapter.signalsBlocked():
-            self._cb_chapter.blockSignals(True)
-            self._cb_chapter.clear()
-            self._cb_chapter.addItems(c_list)
-            self._cb_chapter.blockSignals(False)
+        self._cb_chapter.clear()
+        self._cb_chapter.addItems(c_list)
 
     def _update_grade_combo(self, g_list: list[int]):
-        if not self._cb_grade.signalsBlocked():
-            self._cb_grade.blockSignals(True)
-            items = [grade_name(g) for g in g_list]
-            self._cb_grade.clear()
-            self._cb_grade.addItems(items)
-            self._cb_grade.blockSignals(False)
+        items = [grade_name(g) for g in g_list]
+        self._cb_grade.clear()
+        self._cb_grade.addItems(items)
 
     def _update_problem_table(self, problem_list: list[Problem]):
-        if not self._tw_problem.signalsBlocked():
-            self._tw_problem.blockSignals(True)
-            self._tw_problem.setRowCount(len(problem_list))
-            for i, problem in enumerate(problem_list):
-                self._tw_problem.setItem(
-                    i, 0, table_item_center(grade_name(problem.grade))
-                )
-                self._tw_problem.setItem(i, 1, table_item_center(problem.chapter))
-                self._tw_problem.setItem(i, 2, table_item_center(problem.book))
-                self._tw_problem.setItem(i, 3, table_item_center(problem.title))
-            self._tw_problem.blockSignals(False)
+        self._tw_problem.setRowCount(len(problem_list))
+        for i, problem in enumerate(problem_list):
+            self._tw_problem.setItem(i, 0, table_item_center(grade_name(problem.grade)))
+            self._tw_problem.setItem(i, 1, table_item_center(problem.chapter))
+            self._tw_problem.setItem(i, 2, table_item_center(problem.book))
+            self._tw_problem.setItem(i, 3, table_item_center(problem.title))
 
     def _update_problem_selection(self, index: int):
-        if not self._tw_problem.signalsBlocked():
-            self._tw_problem.blockSignals(True)
-            self._tw_problem.selectRow(index)
-            self._tw_problem.setFocus()
-            self._tw_problem.blockSignals(False)
+        self._tw_problem.selectRow(index)
+        self._tw_problem.setFocus()
 
     def _update_problem_detail(self, problem: Problem | None):
         if problem is None:
             self._sw_problem_contents.setCurrentIndex(2)
-            return
-        self._sw_problem_contents.setCurrentIndex(0 if len(problem.ans_mcq) > 0 else 1)
-        for i, btn_choice in enumerate(self._list_btn_choice):
-            btn_choice.setVisible(i < problem.num_choice)
-            btn_choice.setChecked(i in problem.ans_mcq)
+        else:
+            self._sw_problem_contents.setCurrentIndex(
+                0 if len(problem.ans_mcq) > 0 else 1
+            )
+            for i, btn_choice in enumerate(self._list_btn_choice):
+                btn_choice.setVisible(i < problem.num_choice)
+                btn_choice.setChecked(i in problem.ans_mcq)
 
-    # UI initialization procedures
+    # UI initialization procedures)
 
     def _setup_problem_list_layout(self) -> QVBoxLayout:
 

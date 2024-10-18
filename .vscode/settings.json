@@ -3,5 +3,8 @@
   "python.autoComplete.extraPaths": [
     "$C:/Users/kamut/OneDrive/Desktop/brainscan/libs/"
   ],
-  "python.analysis.autoImportCompletions": true
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.extraPaths": [
+    "$C:/Users/kamut/OneDrive/Desktop/brainscan/libs/"
+  ]
 }

@@ -26,8 +26,8 @@ class AddProblemViewModel(QObject):
             self.is_main = is_main
 
     class NavigateBackWithResult(Event):
-        def __init__(self, problem: Problem):
-            self.problem = problem
+        def __init__(self, problem_id: int):
+            self.problem_id = problem_id
 
     class NavigateBack(Event):
         pass
@@ -37,7 +37,7 @@ class AddProblemViewModel(QObject):
     def __init__(self):
         super().__init__()
         self._problem_repository = ProblemRepository.get_instance()
-        self._image_repository = ImageRepository()
+        self._image_repository = ImageRepository.get_instance()
         self._problem_header: ProblemHeader | None = None
         self._problem_existing: Problem | None = None
         self.problem_type = MutableLiveData(0)
@@ -147,22 +147,28 @@ class AddProblemViewModel(QObject):
             ans_mcq,
             ans_saq,
         )
-
+        
+        problem_id = -1
         if self._problem_existing is None:
             # Adding situation: Insert the problem
             self._problem_repository.insert(problem)
+            added = self._problem_repository.get_problem_by_header(header)
+            if added is not None:
+                problem_id = added.id
         else:
             # Editing situation: Update the problem
             problem.id = self._problem_existing.id
             problem.created = self._problem_existing.created
             self._problem_repository.update(problem)
+            problem_id = self._problem_existing.id
 
         # Save Image(s)
         self._image_repository.save_problem_image(header, image_main, True)
         if image_sub is not None:
             self._image_repository.save_problem_image(header, image_sub, False)
 
-        self._event.emit(AddProblemViewModel.NavigateBackWithResult(problem))
-
+        if problem_id != -1:
+            self._event.emit(AddProblemViewModel.NavigateBackWithResult(problem_id))
+        
     def on_cancel_click(self):
         self._event.emit(AddProblemViewModel.NavigateBack())

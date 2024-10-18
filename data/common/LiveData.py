@@ -1,3 +1,4 @@
+from operator import call
 from typing import Callable, TypeVar
 
 from ui.common.Fragment import Fragment
@@ -6,26 +7,37 @@ from ui.common.Fragment import Fragment
 T = TypeVar("T")  # Define the type variable
 
 
+class Observer[T]:
+
+    def __init__(self, callback: Callable[[T], None], fragment: Fragment | None = None):
+        self.callback = callback
+        self.fragment = fragment
+
+
 class LiveData[T]:
 
     def __init__(self, value: T):
         self.value = value
-        self.observers = list[Callable[[T], None]]()
+        self.observers = list[Observer]()
 
     def _set_value(self, value: T):
         self.value = value
         for observer in self.observers:
-            observer(self.value)
+            if observer.fragment:
+                observer.fragment.block_all_signals(True)
+            observer.callback(self.value)
+            if observer.fragment:
+                observer.fragment.block_all_signals(False)
 
     def _publish(self):
         self._set_value(self.value)
 
-    def _observe(self, observer: Callable[[T], None]):
-        observer(self.value)
-        self.observers.append(observer)
+    def _observe(self, callback: Callable[[T], None]):
+        self.observers.append(Observer(callback, None))
 
-    def observe(self, fragment: Fragment, observer: Callable[[T], None]):
-        self._observe(observer)
+    # observation from fragment (UI)
+    def observe(self, fragment: Fragment, callback: Callable[[T], None]):
+        self.observers.append(Observer(callback, fragment))
         fragment.observe_resume(lambda: self._publish())
 
 

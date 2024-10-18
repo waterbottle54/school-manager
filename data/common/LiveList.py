@@ -1,3 +1,4 @@
+import select
 from typing import Callable
 from data.common.LiveData import LiveData, MutableLiveData, map2
 
@@ -73,7 +74,7 @@ class LiveList[T]:
 
     def select_at(self, index: int):
         if (index < 0) or (index > len(self._lst.value) - 1):
-            self._idx.set_value(len(self._lst.value) - 1)
+            self._idx.set_value(-1)
         else:
             self._idx.set_value(index)
 
@@ -90,6 +91,12 @@ class LiveList[T]:
             self._idx.set_value(index)
         except ValueError:
             self._idx.set_value(-1)
+
+    def select_if(self, condition: Callable[[T], bool]):
+        for i, elem in enumerate(self._lst.value):
+            if condition(elem):
+                self.select(elem)
+                return
 
     def unselect(self):
         self._idx.set_value(-1)

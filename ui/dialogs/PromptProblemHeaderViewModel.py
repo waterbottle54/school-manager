@@ -18,8 +18,8 @@ class PromptProblemHeaderViewModel:
         self.grade_list = [i for i in range(6, 12)]
         self.current_title = MutableLiveData("")
 
-        self.book_repository = BookRepository()
-        self.chapter_repository = ChapterRepository()
+        self.book_repository = BookRepository.get_instance()
+        self.chapter_repository = ChapterRepository.get_instance()
         self.problem_repository = ProblemRepository.get_instance()
 
         self.book_list = self.book_repository.get_list()

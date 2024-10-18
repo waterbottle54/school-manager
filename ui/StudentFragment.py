@@ -6,9 +6,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QPushButton,
     QTableWidget,
-    QTableWidgetItem,
     QVBoxLayout,
-    QHeaderView,
 )
 
 from common.StringRes import *

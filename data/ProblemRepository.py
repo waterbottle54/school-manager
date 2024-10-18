@@ -38,7 +38,6 @@ class ProblemRepository(DatabaseRepository["Problem"]):
         return Problem.from_record(record)
 
     def get_problems(self, book: str, grade: int, chapter: str) -> list[Problem]:
-        print(f"{book}, {grade}, {chapter}")
         ordering = """
             ORDER BY CASE 
             WHEN title NOT LIKE "%[^0-9]%" 

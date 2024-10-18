@@ -35,7 +35,7 @@ class MissViewModel(QObject):
 
         self._miss_repository = MissRepository.get_instance()
         self._problem_repository = ProblemRepository.get_instance()
-        self._image_repository = ImageRepository()
+        self._image_repository = ImageRepository.get_instance()
         self._student = MutableLiveData[Student | None](None)
         self._miss_list: LiveList[Miss]
         self.image_main: LiveData[bytes | None]

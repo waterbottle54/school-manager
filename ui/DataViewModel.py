@@ -34,9 +34,9 @@ class DataViewModel(QObject):
     def __init__(self):
         super().__init__()
 
-        self._school_repository = SchoolRepository()
-        self._book_repository = BookRepository()
-        self._chapter_repository = ChapterRepository()
+        self._school_repository = SchoolRepository.get_instance()
+        self._book_repository = BookRepository.get_instance()
+        self._chapter_repository = ChapterRepository.get_instance()
 
         self._current_grade = MutableLiveData(-1)
         self._school_list = LiveList[str](self._school_repository.get_list_livedata())
@@ -56,12 +56,6 @@ class DataViewModel(QObject):
             self._chapter_list.index_livedata(),
             lambda i: (i > -1) and (i < len(self._chapter_list.list_value()) - 1),
         )
-
-    def on_start(self):
-        self._school_repository.update_livedata()
-        self._book_repository.update_livedata()
-        self._chapter_repository.update_livedata()
-        self._current_grade.set_value(8)
 
     def on_back_click(self):
         self.event.emit(DataViewModel.NavigateBack())

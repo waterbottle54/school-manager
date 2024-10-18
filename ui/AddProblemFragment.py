@@ -58,7 +58,7 @@ class AddProblemFragment(Fragment):
 
     def on_event(self, event):
         if isinstance(event, AddProblemViewModel.NavigateBackWithResult):
-            Navigation.get_instance().navigate_back({"problem": event.problem})
+            Navigation.get_instance().navigate_back({"problem_id": event.problem_id})
         elif isinstance(event, AddProblemViewModel.NavigateBack):
             Navigation.get_instance().navigate_back()
         elif isinstance(event, AddProblemViewModel.PromptImageFile):

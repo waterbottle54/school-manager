@@ -42,10 +42,10 @@ class ProblemViewModel(QObject):
         super().__init__()
 
         # Member variables declaration
-        self._book_repository = BookRepository()
-        self._chapter_repository = ChapterRepository()
+        self._book_repository = BookRepository.get_instance()
+        self._chapter_repository = ChapterRepository.get_instance()
         self._problem_repository = ProblemRepository.get_instance()
-        self._image_repository = ImageRepository()
+        self._image_repository = ImageRepository.get_instance()
 
         self._book_list: LiveList[str]
         self._grade_list: MutableLiveList[int]
@@ -110,21 +110,30 @@ class ProblemViewModel(QObject):
             self._problem_list.selected_livedata(), lambda problem: problem is not None
         )
 
-    def on_restart(self, problem: Problem):
-        self._problem_list.select(problem)
+    def on_restart(self, problem_id: int):
+        print(problem_id)
+        self._problem_list.select_if(lambda p: p.id == problem_id)
+        v = self._problem_list.selected_value()
+        if v is not None:
+            print(v.title)
 
     def on_problem_click(self, row: int, column: int):
+        print('on_problem_click')
         self._problem_list.select_at(row)
 
     def on_book_change(self, index):
+        print('on_book_change')
         self._book_list.select_at(index)
         self._problem_list.select_at(0)
 
     def on_grade_change(self, index: int):
+        print('on_grade_change')
         self._grade_list.select_at(index)
+        self._chapter_list.select_at(0)
         self._problem_list.select_at(0)
 
     def on_chapter_change(self, index: int):
+        print('on_chapter_change')
         self._chapter_list.select_at(index)
         self._problem_list.select_at(0)
 
