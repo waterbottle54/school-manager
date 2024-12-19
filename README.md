@@ -1,17 +1,17 @@
-# SE School Manager (학습 관리자)
+# 학습 관리자 (SE School Manager)
 
  ## Introduction
 
- Login                     |  Admin Menus
-:-------------------------:|:-------------------------:
+ 로그인(Login)                     |  관리자 메뉴(Admin Menus)
+:---------------------------------:|:-------------------------:
 ![](https://github.com/waterbottle54/school-manager/blob/main/screenshots/login.png) | ![](https://github.com/waterbottle54/school-manager/blob/main/screenshots/menus.png)
 
- Data Management            |  Student Registration
- :-------------------------:|:-------------------------:
+ 데이터 관리(Data Management)      |  학생 등록(Student Registration)
+ :--------------------------------:|:-------------------------:
  ![](https://github.com/waterbottle54/school-manager/blob/main/screenshots/data_management.png) | ![](https://github.com/waterbottle54/school-manager/blob/main/screenshots/add_student.png)
 
-  Problem Management        |  Problem Registration
- :-------------------------:|:-------------------------:
+  문제 관리(Problem Management)    |  문제 등록(Problem Registration)
+ :--------------------------------:|:-------------------------:
  ![](https://github.com/waterbottle54/school-manager/blob/main/screenshots/view_problems.png) | ![](https://github.com/waterbottle54/school-manager/blob/main/screenshots/add_problem.png)
  
  * **SE School Manager**는 **Qt5 / Python** 으로 작성된 **Desktop** 학습 관리 소프트웨어입니다.<br>
